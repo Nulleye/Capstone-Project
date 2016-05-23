@@ -1,5 +1,57 @@
 <resources>
-    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="app_bar_height">170dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="item_width">200dp</dimen>
+
+    <dimen name="fab_icon">48dp</dimen>
+
+    <dimen name="swipe_delete_icon_margin">16dp</dimen>
+
+    <dimen name="form_pad">16dp</dimen>
+
+    <dimen name="field_sep">16dp</dimen>
+    <dimen name="field_sep2">8dp</dimen>
+
+    <dimen name="line_sep">10dp</dimen>
+    <dimen name="line_2sep">20dp</dimen>
+    <dimen name="line_sep2">5dp</dimen>
+
+    <dimen name="onoff_size">64dp</dimen>
+
+    <dimen name="title_pad">16dp</dimen>
+    <dimen name="title_mar">20dp</dimen>
+    <dimen name="time_text_size">60sp</dimen>
+
+    <dimen name="spinner_pad">6dp</dimen>
+
+
+    <dimen name="weekday_big">40dp</dimen>
+    <dimen name="weekday_big_text_size">10sp</dimen>
+
+
+    <integer name="transition_time">300</integer>
+
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+
+    <dimen name="list_alarm_pad">12dp</dimen>
+    <dimen name="list_alarm_field_sep">8dp</dimen>
+    <dimen name="list_alarm_line_sep">3dp</dimen>
+    <dimen name="list_alarm_time_text_size">42sp</dimen>
+    <dimen name="list_alarm_onoff_size">56dp</dimen>
+    <item name="list_alarm_time_text_scale" format="float" type="dimen">0.93</item>
+
+
+    <!-- Alarm screen -->
+    <dimen name="alarm_time_text_size">72sp</dimen>
+    <dimen name="alarm_time_title_mar">24dp</dimen>
+    <dimen name="alarm_button">64dp</dimen>
+    <dimen name="alarm_button_pad">14dp</dimen>
+    <dimen name="alarm_button_mar">48dp</dimen>
+
+
 </resources>

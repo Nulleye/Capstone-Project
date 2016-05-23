@@ -1,0 +1,133 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:keepScreenOn="true"
+             android:fitsSystemWindows="true"
+             android:id="@+id/fullscreen_content"
+             tools:context="com.nulleye.yaaa.activities.AlarmActivity"
+             android:alpha="1"
+             android:background="@color/colorPrimary">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="@android:color/white"
+        >
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        android:weightSum="5"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="bottom"
+            android:fitsSystemWindows="true"
+            android:orientation="vertical"
+            android:layout_weight="2"
+            >
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/alarm_time_text_size"
+                android:textColor="@color/colorButtonNormal"
+                android:includeFontPadding="false"
+                android:contentDescription="@string/cd_current_time"
+                />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorButtonNormal"
+                android:contentDescription="@string/cd_current_date"
+                />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@color/colorButtonNormal"
+                android:layout_marginTop="@dimen/alarm_time_title_mar"
+                android:contentDescription="@string/cd_current_alarm_title"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:fitsSystemWindows="true"
+            android:orientation="horizontal"
+            android:layout_weight="3"
+            >
+
+
+            <ImageButton
+                android:id="@+id/snooze"
+                android:layout_width="@dimen/alarm_button"
+                android:layout_height="@dimen/alarm_button"
+                android:layout_gravity="start|center_vertical"
+                android:background="@drawable/snooze_button"
+                android:cropToPadding="false"
+                android:padding="@dimen/alarm_button_pad"
+                app:srcCompat="@drawable/ic_snooze"
+                android:scaleType="fitCenter"
+                android:tint="@color/colorButtonNormal"
+                android:layout_marginLeft="@dimen/alarm_button_mar"
+                android:layout_marginStart="@dimen/alarm_button_mar"
+                android:baselineAlignBottom="false"
+                style="Widget.AppCompat.Button.Colored"
+                android:contentDescription="@string/cd_click_to_snooze_alarm"
+                android:focusable="true"
+                />
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                />
+            <ImageButton
+                android:id="@+id/stop"
+                android:layout_width="@dimen/alarm_button"
+                android:layout_height="@dimen/alarm_button"
+                android:layout_gravity="center_vertical|end"
+                app:srcCompat="@drawable/ic_alarm_off"
+                android:padding="@dimen/alarm_button_pad"
+                android:tint="@color/colorButtonNormal"
+                android:layout_marginRight="@dimen/alarm_button_mar"
+                android:layout_marginEnd="@dimen/alarm_button_mar"
+                android:foregroundGravity="fill"
+                style="Widget.AppCompat.Button.Colored "
+                android:scaleType="fitCenter"
+                android:background="@drawable/stop_button"
+                android:contentDescription="@string/cd_click_to_stop_alarm"
+                android:focusable="true"
+                />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

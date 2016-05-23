@@ -2,21 +2,88 @@
 <manifest package="com.nulleye.yaaa"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!-- <uses-permission android:name="android.permission.DEVICE_POWER" /> -->
     <application
+        android:name=".YaaaApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <provider
+            android:name=".data.YaaaProvider"
+            android:authorities="com.nulleye.yaaa"
+            android:exported="false"/>
+
+        <receiver android:name=".AlarmController">
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.DATE_CHANGED"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.intent.action.LOCALE_CHANGED"/>
+                <!-- Custom events -->
+                <action android:name="com.nulleye.yaaa.ALARM_RING"/>
+                <action android:name="com.nulleye.yaaa.ALARM_STOP"/>
+                <action android:name="com.nulleye.yaaa.ALARM_SNOOZE"/>
+                <action android:name="com.nulleye.yaaa.ALARM_DISMISS"/>
+                <action android:name="com.nulleye.yaaa.ALARM_DAY_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".AlarmRunner"
+            android:exported="false"/>
+
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:name=".activities.AlarmListActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|navigation"
+            android:label="@string/title_alarm_list"
+            android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
+                <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.DESK_DOCK"/>
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.AlarmDetailActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|navigation"
+            android:label="@string/title_alarm_detail"
+            android:launchMode="singleInstance"
+            android:parentActivityName=".activities.AlarmListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nulleye.yaaa.activities.AlarmListActivity"/>
+        </activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|navigation"
+            android:label="@string/title_activity_settings"
+            android:launchMode="singleInstance"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".activities.AlarmActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_alarm"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".activities.AboutActivity"
+                  android:label="@string/title_activity_about"
+                  android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
 

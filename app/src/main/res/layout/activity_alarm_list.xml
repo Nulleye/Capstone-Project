@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context="com.nulleye.yaaa.activities.AlarmListActivity"
+    android:id="@+id/main_coordinator"
+    >
+
+
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_bar_height"
+        android:fitsSystemWindows="true"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                android:gravity="start"/>
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+<!--
+    <me.henrytao.smoothappbarlayout.SmoothAppBarLayout
+        android:id="@+id/smooth_app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/app_bar_height">
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+            <me.henrytao.smoothappbarlayout.SmoothCollapsingToolbarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left|center_vertical"
+                android:minHeight="?attr/actionBarSize"
+                app:sctl_avatar_id="@+id/avatar"
+                app:sctl_collapsed_avatarSize="24dp"
+                app:sctl_collapsed_offsetX="?attr/actionBarSize"
+                app:sctl_collapsed_offsetY="0dp"
+                app:sctl_collapsed_subtitleTextSize="14dp"
+                app:sctl_collapsed_titleTextSize="16dp"
+                app:sctl_expanded_avatarSize="48dp"
+                app:sctl_expanded_offsetX="16dp"
+                app:sctl_expanded_offsetY="16dp"
+                app:sctl_expanded_subtitleTextSize="16dp"
+                app:sctl_expanded_titleTextSize="34dp"
+                app:sctl_subtitle_id="@+id/subtitle"
+                app:sctl_title_id="@+id/title">
+
+                <ImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center_vertical"
+                    app:srcCompat="@drawable/ic_alarm" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/title"
+                        android:text="Title"
+                        style="?android:attr/textAppearanceLarge"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/subtitle"
+                        android:text="Subtitle"
+                        style="?android:attr/textAppearance"
+                        />
+                </LinearLayout>
+            </me.henrytao.smoothappbarlayout.SmoothCollapsingToolbarLayout>
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </me.henrytao.smoothappbarlayout.SmoothAppBarLayout>
+-->
+
+
+    <include layout="@layout/alarm_list"/>
+
+
+    <android.support.design.widget.FloatingActionButton
+    android:id="@+id/fab"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/fab_margin"
+    app:srcCompat="@drawable/ic_alarm_add"
+    android:layout_gravity="bottom|center"
+    android:contentDescription="@string/cd_click_to_add_alarm"
+    android:focusable="true"
+    />
+
+</android.support.design.widget.CoordinatorLayout>
+

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:fitsSystemWindows="true"
+                                                 android:id="@+id/main_coordinator">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:id="@+id/about_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="@dimen/form_pad"
+            >
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/imageView"
+                android:onClick="onClick"
+                android:src="@drawable/nulleye"
+                android:contentDescription="@string/cd_nulleye_logo"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/by_nulleye"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/detail_text_color"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:id="@+id/web_nulleye"
+                android:text="@string/web_nulleye"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/colorAccent"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:paddingBottom="@dimen/line_sep">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:id="@+id/web_github"
+                    android:text="@string/web_github"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/colorAccent"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text=" | "/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:id="@+id/web_linkedin"
+                    android:text="@string/web_linkedin"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/colorAccent"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/udacity_text"
+                android:text="@string/udacity_text"
+                android:paddingBottom="@dimen/line_sep2"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:padding="@dimen/line_sep2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pro_text1"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:padding="@dimen/line_sep2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pro_text2"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:padding="@dimen/line_sep2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pro_text3"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+            <TextView
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="+4-"
+                android:contentDescription="@string/cd_more4less"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:paddingBottom="@dimen/line_sep"
+                android:paddingTop="@dimen/line_sep"
+                />
+
+            <TextView
+                android:layout_gravity="top|start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/thanks_to"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                />
+
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/contrib1"
+                android:text="@string/contrib1"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:padding="@dimen/line_sep"
+                />
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/contrib2"
+                android:text="@string/contrib2"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:padding="@dimen/line_sep"
+                />
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/contrib3"
+                android:text="@string/contrib3"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:padding="@dimen/line_sep"
+                />
+            <TextView
+                android:layout_gravity="top|start"
+                android:gravity="start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/contrib4"
+                android:text="@string/contrib4"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:padding="@dimen/line_sep"
+                />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.NestedScrollView>
+
+</android.support.design.widget.CoordinatorLayout>

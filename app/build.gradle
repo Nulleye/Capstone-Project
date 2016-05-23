@@ -9,19 +9,73 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName "kangaroo"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
-    buildTypes {
+
+    signingConfigs {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            storeFile file('release.keystore')
+            keyAlias 'yaaa.release'
+            storePassword 'udacity-release'
+            keyPassword 'udacity-release'
+        }
+        debug {
+            storeFile file("debug.keystore")
+            keyAlias 'yaaa.debug'
+            storePassword 'udacity-debug'
+            keyPassword 'udacity-debug'
         }
     }
+
+    buildTypes {
+        release {
+            //minifyEnabled true
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debuggable false
+            signingConfig signingConfigs.release
+        }
+        debug {
+            debuggable true
+            signingConfig signingConfigs.debug
+        }
+    }
+
 }
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:design:23.3.0'
+    androidTestCompile 'junit:junit:4.12'
+
+    androidTestCompile 'com.android.support:support-annotations:23.4.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:design:23.4.0'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
+
+    androidTestCompile 'com.android.support.test:runner:0.5'
+    androidTestCompile 'com.android.support.test:rules:0.5'
+
+    //Third party libs - Material controls
+    compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') { transitive = true }
+    compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') { transitive = true }
+    compile 'biz.kasual:materialnumberpicker:1.2.1'
+
+    //This lib code is included as I have done some small patches and bug corrections
+    //'org.adw.library:discrete-seekbar:1.0.1'
+    compile project (':library')
+
 }
+
+//Material controls libs
+//compile 'com.github.rey5137:material:1.2.2'
+//compile "me.henrytao:smooth-app-bar-layout:23.3.0"
+//compile 'com.skyfishjy.ripplebackground:library:1.0.1'
+//compile 'com.balysv:material-ripple:1.0.2'
+//compile 'com.android.support:cardview-v7:23.3.0'
+//compile 'com.github.TouchBoarder:weekdays-buttons-bar:v1.0.1'
+//androidTestCompile 'com.android.support.test.espresso:espresso-core:2.0'

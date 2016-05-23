@@ -1,93 +1,297 @@
 <resources>
-    <string name="app_name">Yaaa</string>
-    <string name="large_text">
-        "Material is the metaphor.\n\n"
 
-        "A material metaphor is the unifying theory of a rationalized space and a system of motion."
-        "The material is grounded in tactile reality, inspired by the study of paper and ink, yet "
-        "technologically advanced and open to imagination and magic.\n"
-        "Surfaces and edges of the material provide visual cues that are grounded in reality. The "
-        "use of familiar tactile attributes helps users quickly understand affordances. Yet the "
-        "flexibility of the material creates new affordances that supercede those in the physical "
-        "world, without breaking the rules of physics.\n"
-        "The fundamentals of light, surface, and movement are key to conveying how objects move, "
-        "interact, and exist in space and in relation to each other. Realistic lighting shows "
-        "seams, divides space, and indicates moving parts.\n\n"
-
-        "Bold, graphic, intentional.\n\n"
-
-        "The foundational elements of print based design typography, grids, space, scale, color, "
-        "and use of imagery guide visual treatments. These elements do far more than please the "
-        "eye. They create hierarchy, meaning, and focus. Deliberate color choices, edge to edge "
-        "imagery, large scale typography, and intentional white space create a bold and graphic "
-        "interface that immerse the user in the experience.\n"
-        "An emphasis on user actions makes core functionality immediately apparent and provides "
-        "waypoints for the user.\n\n"
-
-        "Motion provides meaning.\n\n"
-
-        "Motion respects and reinforces the user as the prime mover. Primary user actions are "
-        "inflection points that initiate motion, transforming the whole design.\n"
-        "All action takes place in a single environment. Objects are presented to the user without "
-        "breaking the continuity of experience even as they transform and reorganize.\n"
-        "Motion is meaningful and appropriate, serving to focus attention and maintain continuity. "
-        "Feedback is subtle yet clear. Transitions are efﬁcient yet coherent.\n\n"
-
-        "3D world.\n\n"
-
-        "The material environment is a 3D space, which means all objects have x, y, and z "
-        "dimensions. The z-axis is perpendicularly aligned to the plane of the display, with the "
-        "positive z-axis extending towards the viewer. Every sheet of material occupies a single "
-        "position along the z-axis and has a standard 1dp thickness.\n"
-        "On the web, the z-axis is used for layering and not for perspective. The 3D world is "
-        "emulated by manipulating the y-axis.\n\n"
-
-        "Light and shadow.\n\n"
-
-        "Within the material environment, virtual lights illuminate the scene. Key lights create "
-        "directional shadows, while ambient light creates soft shadows from all angles.\n"
-        "Shadows in the material environment are cast by these two light sources. In Android "
-        "development, shadows occur when light sources are blocked by sheets of material at "
-        "various positions along the z-axis. On the web, shadows are depicted by manipulating the "
-        "y-axis only. The following example shows the card with a height of 6dp.\n\n"
-
-        "Resting elevation.\n\n"
-
-        "All material objects, regardless of size, have a resting elevation, or default elevation "
-        "that does not change. If an object changes elevation, it should return to its resting "
-        "elevation as soon as possible.\n\n"
-
-        "Component elevations.\n\n"
-
-        "The resting elevation for a component type is consistent across apps (e.g., FAB elevation "
-        "does not vary from 6dp in one app to 16dp in another app).\n"
-        "Components may have different resting elevations across platforms, depending on the depth "
-        "of the environment (e.g., TV has a greater depth than mobile or desktop).\n\n"
-
-        "Responsive elevation and dynamic elevation offsets.\n\n"
-
-        "Some component types have responsive elevation, meaning they change elevation in response "
-        "to user input (e.g., normal, focused, and pressed) or system events. These elevation "
-        "changes are consistently implemented using dynamic elevation offsets.\n"
-        "Dynamic elevation offsets are the goal elevation that a component moves towards, relative "
-        "to the component’s resting state. They ensure that elevation changes are consistent "
-        "across actions and component types. For example, all components that lift on press have "
-        "the same elevation change relative to their resting elevation.\n"
-        "Once the input event is completed or cancelled, the component will return to its resting "
-        "elevation.\n\n"
-
-        "Avoiding elevation interference.\n\n"
-
-        "Components with responsive elevations may encounter other components as they move between "
-        "their resting elevations and dynamic elevation offsets. Because material cannot pass "
-        "through other material, components avoid interfering with one another any number of ways, "
-        "whether on a per component basis or using the entire app layout.\n"
-        "On a component level, components can move or be removed before they cause interference. "
-        "For example, a floating action button (FAB) can disappear or move off screen before a "
-        "user picks up a card, or it can move if a snackbar appears.\n"
-        "On the layout level, design your app layout to minimize opportunities for interference. "
-        "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
-        "when a user tries to pick up one of cards.\n\n"
-    </string>
+    <!-- APPLICATION -->
+    <string name="app_name">YAAA</string>
     <string name="action_settings">Settings</string>
+    <string name="action_about">About</string>
+    <string name="title_alarm_list">YAAA alarms</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_alarm">Alarm</string>
+    <string name="title_alarm_detail">Alarm details</string>
+    <string name="title_activity_about">About YAAA</string>
+
+
+    <!-- ALARM -->
+
+    <!-- Days of week -->
+    <string name="every_day">every day</string>
+    <string name="never">never</string>
+    <string name="day_concat">", "</string>
+
+    <!-- Next ring texts -->
+    <string name="today">today</string>
+    <string name="was_today">was today</string>
+    <string name="tomorrow">tomorrow</string>
+    <string name="yesterday">yesterday</string>
+    <string name="next_ring_message">Next: %s</string>
+    <string name="next_ring_vacation_message">Planned for %s but disabled for vacation</string>
+    <string name="passed_date">last %s</string>
+    <string name="fmt_weekday_time">EEEE \'at\' %s</string>
+    <string name="fmt_weekday_day_time">EEEE, d \'at\' %s</string>
+    <string name="fmt_weekday_day_month_time">EEEE, MMMM d \'at\' %s</string>
+    <string name="fmt_weekday_day_month_year_time">EEEE, MMMM d of yyyy \'at\' %s</string>
+    <string name="fmt_weekday">EEEE</string>
+    <string name="fmt_weekday_day">EEEE, d</string>
+    <string name="fmt_weekday_day_month">EEEE, MMMM d</string>
+    <string name="fmt_weekday_day_month_year">EEEE, MMMM d of yyyy</string>
+    <string name="text_time">\'%1$s at\' %2$s</string>
+
+    <!-- Date config summary -->
+    <string name="only_date">only on %s</string>
+    <string name="daily_from">daily from %s</string>
+    <string name="monthly_from">monthly from %s</string>
+    <string name="annual_from">annual from %s</string>
+
+
+    <!-- NOTIFICATIONS -->
+    <string name="dismiss_alarm">"Dismiss alarm"</string>
+    <string name="wake_times_in"> and %1$s in %2$s</string>
+    <plurals name="wake_retries">
+        <item quantity="one">%d retry</item>
+        <item quantity="other">%d retries</item>
+    </plurals>
+
+    <!-- ALARM LIST SCREEN -->
+    <string name="press_plus_to_add_alarm">Press the button to add an alarm</string>
+    <string name="swipe_to_delete">Swipe left or right to delete an alarm</string>
+
+
+    <!-- ALARM TITLE -->
+    <string name="hint_title">set alarm title</string>
+    <string name="title">Title</string>
+    <string name="default_title">Title</string>
+
+    <!-- ALARM TIME -->
+    <string name="hint_time">alarm time</string>
+    <string name="time">Time</string>
+
+    <!-- ALARM REPETITION -->
+    <string name="hint_repetition">alarm repetition</string>
+    <string name="repetition">Repetition</string>
+    <string-array name="repetition">
+        <item>None</item>
+        <item>Week days</item>
+        <item>Daily</item>
+        <item>Monthly</item>
+        <item>Annual</item>
+    </string-array>
+
+    <!-- ALARM DATE -->
+    <string name="hint_date">date</string>
+    <string name="date">Date</string>
+    <string name="choose_date">Choose a date</string>
+
+    <!-- SOUND TYPE -->
+    <string name="hint_sound_type">sound</string>
+    <string name="sound_type">Sound</string>
+    <string-array name="sound_type">
+        <item>Default</item>
+        <item>None</item>
+        <item>Ringtone</item>
+        <item>Notification</item>
+        <item>Alarm</item>
+        <item>Artist/Album</item>
+        <item>Song</item>
+    </string-array>
+    <string-array name="sound_type_prefs">
+        <item>None</item>
+        <item>Ringtone</item>
+        <item>Notification</item>
+        <item>Alarm</item>
+        <item>Artist/Album</item>
+        <item>Song</item>
+    </string-array>
+    <string name="sound_type_none">None</string>
+    <string name="select_sound_type">Choose a sound type</string>
+    <string name="select_sound">Choose a sound</string>
+    <string name="select_ringtone">Choose a ringtone</string>
+    <string name="select_notification">Choose a notification</string>
+    <string name="select_alarm">Choose an alarm</string>
+    <string name="select_folder">Choose an artist/album folder</string>
+    <string name="select_song">Choose a song</string>
+    <string name="hint_sound_source">sound source</string>
+    <string name="song_not_found">%s not found</string>
+    <string name="songs_not_found">%s has no songs</string>
+
+    <!-- VOLUME -->
+    <string name="volume">Volume</string>
+    <string name="hint_volume">volume</string>
+    <string name="vibrate">Vibrate</string>
+    <string name="hint_vibrate">vibrate</string>
+    <string name="volume_default">Default</string>
+    <string name="volume_disabled">Mute</string>
+
+    <!-- GRADUAL VOLUME -->
+    <string name="gradual_interval">Gradual\nvolume</string>
+    <string name="hint_gradual_interval">gradual volume</string>
+    <plurals name="interval_second">
+        <item quantity="one">%s second</item>
+        <item quantity="other">%s seconds</item>
+    </plurals>
+    <string name="interval_second_redux">%s s</string>
+    <string name="gradual_volume">Gradual volume</string>
+
+    <!-- WAKE TIMES -->
+    <string name="wake_verification">Wake up\nverification</string>
+    <string name="wake_retries">retries</string>
+    <string name="hint_wake_retries">retries</string>
+    <string name="wake_interval">interval</string>
+    <string name="hint_wake_interval">interval</string>
+    <string name="wake_verification_retries">Wake up verification retries</string>
+    <string name="wake_verification_interval">Wake up verification interval</string>
+
+    <!-- DELETE ALARM -->
+    <string name="autodelete_alarm">Delete alarm automatically</string>
+    <string name="hint_autodelete_alarm">auto-delete alarm</string>
+    <string name="autodelete_alarm_done">When done</string>
+    <string name="hint_autodelete_alarm_done">when done</string>
+    <string name="autodelete_alarm_after">After</string>
+    <string name="hint_autodelete_alarm_after">after</string>
+    <string name="hint_autodelete_alarm_after_date">after date</string>
+    <string name="autodelete_has_effect">Alarm is repetitive, so this option has no effect.</string>
+
+    <!-- DELETE ALARM -->
+    <string name="ignore_vacation_period">Ignore vacation periods</string>
+    <string name="hint_ignore_vacation_period">ignore vacation period</string>
+    <string name="see_settings">(see settings)</string>
+
+    <!-- BUTTONS -->
+    <string name="btn_dismiss">Dismiss</string>
+    <string name="btn_undo">Undo</string>
+    <string name="btn_choose">Choose</string>
+
+
+    <!-- PREFERENCES -->
+    <string name="vacation_period">Vacation period from now to date</string>
+    <string name="hint_vacation_period">Vacation period from now to date</string>
+    <string name="hint_vacation_period_date">date</string>
+    <string name="no_final_date_defined">No date defined</string>
+    <string name="vacation_period_exp">Disable alarms from now to this date included,
+        except for alarms with <b>Ignore vacation periods</b>.</string>
+
+    <string name="notification_interval">Notification\ninterval</string>
+    <string name="hint_notification_interval">notification interval</string>
+    <string name="notification_interval_exp">A notification will appear this interval before the alarm rings,
+        where you can dismiss the alarm.</string>
+
+    <string name="snooze_interval">Snooze\ninterval</string>
+    <string name="hint_snooze_interval">snooze interval</string>
+
+    <string name="alarm_defaults">Alarm defaults</string>
+
+    <!-- interval picker -->
+    <string name="default_value">Default</string>
+    <string name="disabled_value">Disabled</string>
+    <plurals name="interval_minute">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <string name="interval_minute_redux">%s min</string>
+    <plurals name="interval_hour">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <string name="interval_hour_redux">%s h</string>
+
+    <string name="default_format">Default (%s)</string>
+    <string name="default_format2">Default: %s</string>
+
+
+    <!-- next alarm summary -->
+    <string name="next_scheduled_alarm">%1$s on %2$s</string>
+    <string name="no_next_scheduled_alarm">There is no next scheduled alarm</string>
+
+
+    <!-- Alarm -->
+    <string name="btn_snooze">Snooze</string>
+    <string name="btn_stop">Stop</string>
+
+
+    <!-- About -->
+    <string name="by_nulleye">by <b>nulleye</b></string>
+    <string name="web_nulleye"><a href="http://www.nulleye.com">www.nulleye.com</a></string>
+    <string name="web_github"><a href="http://github.com/Nulleye">Github</a></string>
+    <string name="web_linkedin"><a href="http://www.linkedin.com/in/cristianalvarezplanas">linkedIn</a></string>
+    <string name="udacity_text">This is the <b>Capstone project</b> for the <b><a href="http://www.udacity.com">Udacity</a></b> Android nanoDegree by Google.<br/>
+    A <b>Pro</b> version of this app is on the works and will include:</string>
+    <string name="pro_text1">A specific <b>Tablet layout</b> design.</string>
+    <string name="pro_text2">Multiple <b>Alarm screens</b> or alarm dismiss modes, such as \'<b>Phone shake</b> to Snooze - <b>Random
+    button position</b> to Stop\', or \'<b>Conscious mode</b> - solve a problem to Stop\'.</string>
+    <string name="pro_text3">Multiple online sound streaming sources, such as <b>Spotify</b>, online <b>Radios</b>, <b>Google Play Music</b>, etc.</string>
+
+    <string name="thanks_to">This app could not have been possible without the inestimable contribution of these <b>Open Source</b> world philanthropists:</string>
+
+    <string name="contrib1"><b>Aidan Follestad</b> for his Material Dialogs <a href="http://github.com/afollestad/material-dialogs">github.com/afollestad/material-dialogs</a></string>
+    <string name="contrib2"><b>Ander Webbs</b> for his fast Material DiscreteSeekBar <a href="http://github.com/AnderWeb/discreteSeekBar">github.com/AnderWeb/discreteSeekBar</a></string>
+    <string name="contrib3"><b>Kasual Business</b> for its Material NumberPicker dialog <a href="http://github.com/KasualBusiness/MaterialNumberPicker">github.com/KasualBusiness/MaterialNumberPicker</a></string>
+    <string name="contrib4">And the <b>Android Open Source Project</b> for everything else <a href="http://source.android.com/">source.android.com</a></string>
+
+
+    <!-- CONTENT DESCRIPTIONS -->
+
+    <!-- Alarm list -->
+    <string name="cd_alarm_time">Alarm time</string>
+    <string name="cd_alarm_title">Alarm title</string>
+    <string name="cd_alarm_config_summary">Alarm configuration summery</string>
+    <string name="cd_alarm_onoff_switch">Alarm on-off switch</string>
+    <string name="cd_alarm_next_planned_ring">Next planned alarm ring</string>
+    <string name="cd_undo_alarm_delete">Undo this alarm deletion (3 seconds)</string>
+    <string name="cd_press_plus_button">Pres the Plus button to add an alarm</string>
+    <string name="cd_click_to_add_alarm">Click to add a new alarm</string>
+
+    <!-- Alarm detail -->
+    <string name="cd_click_to_choose_alarm_time">Click to choose the alarm time</string>
+    <string name="cd_click_to_switch_alarm_onoff">Click to enable or disable the alarm</string>
+    <string name="cd_alarm_repetition">Alarm repetition</string>
+    <string name="cd_select_alarm_repetition_type">Select alarm repetition type: daily, week days, monthly, etc</string>
+    <string name="cd_alarm_date">Alarm date</string>
+    <string name="cd_select_alarm_date">Click to select alarm date</string>
+    <string name="cd_click_to_select_first_day_of_week">Click to select the first day of the wwek</string>
+    <string name="cd_click_to_select_second_day_of_week">Click to select the second day of the wwek</string>
+    <string name="cd_click_to_select_third_day_of_week">Click to select the third day of the wwek</string>
+    <string name="cd_click_to_select_fourth_day_of_week">Click to select the fourth day of the wwek</string>
+    <string name="cd_click_to_select_fifth_day_of_week">Click to select the fifth day of the wwek</string>
+    <string name="cd_click_to_select_sixth_day_of_week">Click to select the sixth day of the wwek</string>
+    <string name="cd_click_to_select_seventh_day_of_week">Click to select the seventh day of the wwek</string>
+    <string name="cd_alarm_soundtype_and_source">Alarm sound type and source</string>
+    <string name="cd_click_to_choose_soundtype">Click to choose the alarm sound type</string>
+    <string name="cd_click_to_choose_soundsource">Click to choose the alarm sound source (tone)</string>
+    <string name="cd_alarm_volume_and_vibration">Alarm volume and vibration</string>
+    <string name="cd_select_volume_level_defto100">Seek volume level: first default, second Mute up to 100%</string>
+    <string name="cd_alarm_vibration">Enable alarm vibration</string>
+    <string name="cd_alarm_default_volume">Current alarm default volume setting</string>
+    <string name="cd_alarm_gradual_volume">Alarm gradual volume</string>
+    <string name="cd_click_to_select_gradual_interval">Click to select the gradual volume interval in seconds</string>
+    <string name="cd_alarm_wake_up_verifications">Alarm wake up verifications</string>
+    <string name="cd_click_to_select_wake_up_verifications">Click to select the number of times to check if you are really awake</string>
+    <string name="cd_click_to_select_wake_up_interval">Click to select the time interval to check in minutes</string>
+    <string name="cd_auto_delete_alarm">Auto delete alarm</string>
+    <string name="cd_autodelete_when_done">Auto delete alarm when done</string>
+    <string name="cd_autodelete_for_none">Auto delete when done warning, only for non repetitive alarms</string>
+    <string name="cd_autodelete_after_date">Auto delete after a date</string>
+    <string name="cd_click_to_choose_autodelete_after_date">Click to choose auto delete after date</string>
+    <string name="cd_alarm_ignores_vacation">Alarm ignores vacation periods</string>
+    <string name="cd_click_to_save_alarm_and_exit">Click to save the alarm and exit screen</string>
+
+    <!-- Settings -->
+    <string name="cd_vacation_period">Enable vacation period</string>
+    <string name="cd_vacation_period_end_date">Vacation period</string>
+    <string name="cd_choose_final_date_of_vacation">Click to choose the final date of your vacation period</string>
+    <string name="cd_notification_interval">Alarm notification interval</string>
+    <string name="cd_click_to_select_notification_interval">Click to select the alarm notification interval in minutes</string>
+    <string name="cd_snooze_interval">Alarm snooze interval</string>
+    <string name="cd_click_to_select_snooze_interval">Click to select the alarm snooze interval in minutes</string>
+
+    <!-- Alarm screen -->
+    <string name="cd_current_time">Current time</string>
+    <string name="cd_current_date">Current date</string>
+    <string name="cd_current_alarm_title">Current alarm title</string>
+    <string name="cd_click_to_snooze_alarm">Click to snooze alarm</string>
+    <string name="cd_click_to_stop_alarm">Click to stop alarm</string>
+
+    <!-- About -->
+    <string name="cd_nulleye_logo">Nulleye logo</string>
+    <string name="cd_more4less">More for less…</string>
+
+
 </resources>
