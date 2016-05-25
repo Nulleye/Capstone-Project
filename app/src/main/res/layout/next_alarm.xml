@@ -1,0 +1,62 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/widget_margin"
+    android:background="@color/colorPrimary">
+    <FrameLayout android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:layout_margin="@dimen/widget_square_margin"
+                 android:background="@color/colorAccent">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|top"
+            android:src="@drawable/ic_alarm_widget"
+            android:id="@+id/appwidget_no_alarm_image"
+            android:contentDescription="@string/appwidget_no_next_alarm"
+            android:layout_margin="@dimen/widget_no_alarm_margin"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:id="@+id/appwidget_content"
+            >
+
+            <TextView
+                android:id="@+id/appwidget_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:background="@color/colorAccent"
+                android:contentDescription="@string/appwidget_time"
+                android:textColor="@color/colorButtonNormal"
+                android:textSize="42sp"
+                android:includeFontPadding="false"
+                android:layout_marginTop="-3dp"
+                android:layout_marginBottom="-3dp"
+                />
+
+            <TextView
+                android:id="@+id/appwidget_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center|bottom"
+                android:background="@color/colorAccent"
+                android:contentDescription="@string/appwidget_date"
+                android:textColor="#ffffff"
+                android:textSize="12sp"
+                android:text="@string/appwidget_no_next_alarm"
+                android:layout_marginBottom="@dimen/widget_square_margin"
+                />
+
+        </LinearLayout>
+
+    </FrameLayout>
+</FrameLayout>

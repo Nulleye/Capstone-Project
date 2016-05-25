@@ -84,6 +84,7 @@ public class YaaaContract {
 
         public static final String[] COLUMN_ALL = {"*"};
         public static final String ORDER_TIME = COLUMN_TIME + " ASC";
+        public static final String ORDER_NEXT = COLUMN_NEXT_RING + " ASC LIMIT 1";
 
 
         public static Uri buildAlarmUri(final long id) {

@@ -12,6 +12,7 @@ import android.support.v4.content.Loader;
 import android.util.Log;
 
 import com.nulleye.yaaa.AlarmController;
+import com.nulleye.yaaa.NextAlarmWidget;
 import com.nulleye.yaaa.YaaaApplication;
 import com.nulleye.yaaa.data.YaaaContract.AlarmEntry;
 import com.nulleye.yaaa.util.FnUtil;
@@ -44,26 +45,34 @@ public class AlarmDbHelper {
 
 
     public static boolean addAlarm(final Context context, final Alarm alarm) {
-        Log.d(TAG, "addAlarm: " + alarm.getLogInfo(context));
-        final Uri uri = context.getContentResolver()
-                .insert(AlarmEntry.CONTENT_URI,
-                        alarm.getContentValues(true));  //Get values and calculate nextring
-        alarm.setId((int) ContentUris.parseId(uri));
-        final boolean result = alarm.hasId();
-        if (result) return AlarmController.addAlarm(context, alarm);
-        return result;
+        try {
+            Log.d(TAG, "addAlarm: " + alarm.getLogInfo(context));
+            final Uri uri = context.getContentResolver()
+                    .insert(AlarmEntry.CONTENT_URI,
+                            alarm.getContentValues(true));  //Get values and calculate nextring
+            alarm.setId((int) ContentUris.parseId(uri));
+            final boolean result = alarm.hasId();
+            if (result) return AlarmController.addAlarm(context, alarm);
+            return result;
+        } finally {
+            NextAlarmWidget.forceUpdateAppWidget(context);
+        }
     }
 
 
     public static boolean updateAlarm(final Context context, final Alarm alarm) {
         Log.d(TAG, "updateAlarm: " + alarm.getLogInfo(context));
         if (alarm.hasId()) {
-            final int rows = context.getContentResolver()
-                    .update(AlarmEntry.buildAlarmUri(alarm.getId()),
-                            alarm.getContentValues(true), null, null); //Get values and calculate nextring
-            final boolean result = (rows == 1);
-            if (result) return AlarmController.updateAlarm(context, alarm);
-            return result;
+            try {
+                final int rows = context.getContentResolver()
+                        .update(AlarmEntry.buildAlarmUri(alarm.getId()),
+                                alarm.getContentValues(true), null, null); //Get values and calculate nextring
+                final boolean result = (rows == 1);
+                if (result) return AlarmController.updateAlarm(context, alarm);
+                return result;
+            } finally {
+                NextAlarmWidget.forceUpdateAppWidget(context);
+            }
         } else return addAlarm(context, alarm);
     }
 
@@ -71,18 +80,22 @@ public class AlarmDbHelper {
     public static boolean enableAlarm(final Context context, final Alarm alarm, final boolean enable) {
         Log.d(TAG, "enableAlarm: " + alarm.getLogInfo(context) + " enable=" + enable);
         if (alarm.hasId()) {
-            final ContentValues values;
-            if (enable && alarm.calculateNextRingChanged(true)) {
-                values = new ContentValues(2);
-                values.put(AlarmEntry.COLUMN_NEXT_RING, alarm.getNextRing());
-            } else values = new ContentValues(1);
-            alarm.setEnabled(enable);
-            values.put(AlarmEntry.COLUMN_ENABLED, FnUtil.booleanToInt(enable));
-            final int rows = context.getContentResolver()
-                    .update(AlarmEntry.buildAlarmUri(alarm.getId()), values, null, null);
-            final boolean result = (rows == 1);
-            if (result) return AlarmController.updateAlarm(context, alarm);
-            return result;
+            try {
+                final ContentValues values;
+                if (enable && alarm.calculateNextRingChanged(true)) {
+                    values = new ContentValues(2);
+                    values.put(AlarmEntry.COLUMN_NEXT_RING, alarm.getNextRing());
+                } else values = new ContentValues(1);
+                alarm.setEnabled(enable);
+                values.put(AlarmEntry.COLUMN_ENABLED, FnUtil.booleanToInt(enable));
+                final int rows = context.getContentResolver()
+                        .update(AlarmEntry.buildAlarmUri(alarm.getId()), values, null, null);
+                final boolean result = (rows == 1);
+                if (result) return AlarmController.updateAlarm(context, alarm);
+                return result;
+            } finally {
+                NextAlarmWidget.forceUpdateAppWidget(context);
+            }
         } else {
             alarm.setEnabled(enable);
             return addAlarm(context, alarm);
@@ -93,14 +106,18 @@ public class AlarmDbHelper {
     public static boolean updateAlarmRing(final Context context, final Alarm alarm) {
         Log.d(TAG, "updateAlarmRing: " + alarm.getLogInfo(context));
         if (alarm.hasId()) {
-            final ContentValues values = new ContentValues(1);
-            values.put(AlarmEntry.COLUMN_NEXT_RING, alarm.getNextRing());
-            final int rows = context.getContentResolver()
-                    .update(AlarmEntry.buildAlarmUri(alarm.getId()), values, null, null);
-            return (rows == 1);
-//            final boolean result = (rows == 1);
-//            if (result) return AlarmController.updateAlarm(context, alarm);
-//            return result;
+            try {
+                final ContentValues values = new ContentValues(1);
+                values.put(AlarmEntry.COLUMN_NEXT_RING, alarm.getNextRing());
+                final int rows = context.getContentResolver()
+                        .update(AlarmEntry.buildAlarmUri(alarm.getId()), values, null, null);
+                return (rows == 1);
+    //            final boolean result = (rows == 1);
+    //            if (result) return AlarmController.updateAlarm(context, alarm);
+    //            return result;
+            } finally {
+                NextAlarmWidget.forceUpdateAppWidget(context);
+            }
         } else return addAlarm(context, alarm);
     }
 
@@ -119,20 +136,24 @@ public class AlarmDbHelper {
 
 
     public static boolean deleteAlarm(final Context context, final int alarmId) {
-        Log.d(TAG, "deleteAlarm: id=" + alarmId);
-        if (Alarm.isValidId(alarmId)) {
-            final int rows = context.getContentResolver()
-                    .delete(AlarmEntry.buildAlarmUri(alarmId), "", null);
-            final boolean result = (rows == 1);
-            if (result) AlarmController.removeAlarm(context, alarmId);
-            return result;
-        } else {
-            //Remove all notifications and alarms set
-            final int counter = AlarmController.removeAlarms(context, false);
-            //Delete all alarms int the db
-            final int rows = context.getContentResolver().delete(AlarmEntry.CONTENT_URI, "", null);
-            if (rows < counter) AlarmController.scheduleAlarms(context, false);
-            return (rows == counter);
+        try {
+            Log.d(TAG, "deleteAlarm: id=" + alarmId);
+            if (Alarm.isValidId(alarmId)) {
+                final int rows = context.getContentResolver()
+                        .delete(AlarmEntry.buildAlarmUri(alarmId), "", null);
+                final boolean result = (rows == 1);
+                if (result) AlarmController.removeAlarm(context, alarmId);
+                return result;
+            } else {
+                //Remove all notifications and alarms set
+                final int counter = AlarmController.removeAlarms(context, false);
+                //Delete all alarms int the db
+                final int rows = context.getContentResolver().delete(AlarmEntry.CONTENT_URI, "", null);
+                if (rows < counter) AlarmController.scheduleAlarms(context, false);
+                return (rows == counter);
+            }
+        } finally {
+            NextAlarmWidget.forceUpdateAppWidget(context);
         }
     }
 
@@ -184,6 +205,19 @@ public class AlarmDbHelper {
         Log.d(TAG, "getAlarms: enabled=" + enabled + " ignoreVacation=" + ignoreVacation + " nextRing=" + nextRing);
         return context.getContentResolver().query(AlarmEntry.CONTENT_URI, AlarmEntry.COLUMN_ALL,
                 buildSelection(enabled, ignoreVacation, nextRing).build(), null, AlarmEntry.ORDER_TIME);
+    }
+
+
+    public static Alarm getNextAlarm(final Context context, final Boolean ignoreVacation, final Long current) {
+        Log.d(TAG, "getNextAlarm: ignoreVacation=" + ignoreVacation + " current=" + current);
+        Cursor result = context.getContentResolver().query(AlarmEntry.CONTENT_URI, AlarmEntry.COLUMN_ALL,
+                buildSelection(Boolean.TRUE, ignoreVacation, current).build(), null, AlarmEntry.ORDER_NEXT);
+        if (FnUtil.hasData(result)) {
+            final Alarm alarm = new Alarm(result);
+            result.close();
+            return alarm;
+        }
+        return null;
     }
 
 

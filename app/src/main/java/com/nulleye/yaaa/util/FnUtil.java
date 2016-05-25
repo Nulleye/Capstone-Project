@@ -542,4 +542,12 @@ public class FnUtil {
         return view.getMeasuredWidth();
     }
 
+    public static boolean safeBoolEqual(final Object boolObject, final boolean bool) {
+        return (boolObject != null) && (boolObject instanceof Boolean) && ((Boolean) boolObject == bool);
+    }
+
+    public static boolean safeIntEqual(final Object intObject, final int inte) {
+        return (intObject != null) && (intObject instanceof Integer) && ((Integer) intObject == inte);
+    }
+
 }

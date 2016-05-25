@@ -328,7 +328,7 @@ public class AlarmDetailFragment extends Fragment implements
         final Context context = this.getContext();
         //Prevent check from firing the first time
         if (buttonView.getTag() != null) {
-            if (buttonView.getTag() == isChecked) {
+            if (FnUtil.safeBoolEqual(buttonView.getTag(), isChecked)) {
                 buttonView.setTag(null);
                 return;
             }
@@ -349,7 +349,7 @@ public class AlarmDetailFragment extends Fragment implements
                 if (alarm.hasDeleteDate())
                     switchAlarmDeleteOption(context, (RadioButton) buttonView, isChecked);
                 else {
-                    autodelete_alarm_after.setTag(false);
+                    autodelete_alarm_after.setTag(Boolean.FALSE);
                     autodelete_alarm_after.setChecked(false);
                     chooseDeleteAferDate(context);
                 }
@@ -382,7 +382,7 @@ public class AlarmDetailFragment extends Fragment implements
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         //Prevent spinner from firing the first time
         if (parent.getTag() != null) {
-            if (parent.getTag() == position) {
+            if (FnUtil.safeIntEqual(parent.getTag(), position)) {
                 parent.setTag(null);
                 return;
             }
@@ -651,11 +651,11 @@ public class AlarmDetailFragment extends Fragment implements
         if (checked) {
             if (clickedView.getId() == R.id.autodelete_alarm_done) {
                 alarm.setDeleteDone(true);
-                autodelete_alarm_after.setTag(false);
+                autodelete_alarm_after.setTag(Boolean.FALSE);
                 autodelete_alarm_after.setChecked(false);
             } else {
                 alarm.setDeleteDone(false);
-                autodelete_alarm_done.setTag(false);
+                autodelete_alarm_done.setTag(Boolean.FALSE);
                 autodelete_alarm_done.setChecked(false);
             }
             checkAutodeleteRepetitive();
@@ -863,14 +863,14 @@ public class AlarmDetailFragment extends Fragment implements
 
     private void setDeleteOption() {
         if (alarm.isDeleteDone()) {
-            autodelete_alarm_done.setTag(true);
+            autodelete_alarm_done.setTag(Boolean.TRUE);
             autodelete_alarm_done.setChecked(true);
-            autodelete_alarm_after.setTag(false);
+            autodelete_alarm_after.setTag(Boolean.FALSE);
             autodelete_alarm_after.setChecked(false);
         } else if (alarm.hasDeleteDate()) {
-            autodelete_alarm_done.setTag(false);
+            autodelete_alarm_done.setTag(Boolean.FALSE);
             autodelete_alarm_done.setChecked(false);
-            autodelete_alarm_after.setTag(true);
+            autodelete_alarm_after.setTag(Boolean.TRUE);
             autodelete_alarm_after.setChecked(true);
         }
         checkAutodeleteRepetitive();

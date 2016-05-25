@@ -249,7 +249,7 @@ public class SettingsActivity extends AppCompatActivity implements
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         //Prevent check from firing the first time
         if (buttonView.getTag() != null) {
-            if (buttonView.getTag() == isChecked) {
+            if (FnUtil.safeBoolEqual(buttonView.getTag(), isChecked)) {
                 buttonView.setTag(null);
                 return;
             }

@@ -272,6 +272,7 @@ public class AlarmController extends BroadcastReceiver {
     private static boolean addAlarm(final Context context, final Alarm alarm, final Calendar current) {
         if (alarm.calculateNextRingChanged(current, false)) AlarmDbHelper.updateAlarmRing(context, alarm);
         if (alarm.kindScheduledRing(current) == Alarm.SCH_YES) setAlarm(context, alarm);
+        else return !unsetAlarm(context, alarm, current);
         if (alarm.shouldDelete(current)) return !AlarmDbHelper.deleteAlarm(context, alarm);     //Alarm has been auto-deleted
         return true;
     }
@@ -404,7 +405,7 @@ public class AlarmController extends BroadcastReceiver {
                         PendingIntent.getBroadcast(context, -alarm.getId(), intentNot, PendingIntent.FLAG_UPDATE_CURRENT));
             }
             am.setAlarmClock(
-                    new AlarmManager.AlarmClockInfo(alarm.getNextRing(), buildAlarmViewIntent(context, alarm)),
+                    new AlarmManager.AlarmClockInfo(alarm.getNextRing(), buildAlarmViewIntent(context, alarm, false)),
                     PendingIntent.getBroadcast(context, alarm.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT));
         } else {
             //Is just the initial alarm notification?
@@ -446,7 +447,7 @@ public class AlarmController extends BroadcastReceiver {
                 .setSmallIcon(R.drawable.ic_alarm)
                 .setContentTitle(alarm.getTitle(context))
                 .setContentText(alarm.getAlarmNotificationSummary(context))
-                .setContentIntent(buildAlarmViewIntent(context, alarm))
+                .setContentIntent(buildAlarmViewIntent(context, alarm, false))
                 .addAction(R.drawable.ic_alarm_off, context.getString(R.string.dismiss_alarm),
                         PendingIntent.getBroadcast(context, alarm.getId(), dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                 .build();
@@ -458,7 +459,7 @@ public class AlarmController extends BroadcastReceiver {
     }
 
 
-    private static PendingIntent buildAlarmViewIntent(final Context context, final Alarm alarm) {
+    public static PendingIntent buildAlarmViewIntent(final Context context, final Alarm alarm, final boolean forWidget) {
         // Build Intent/s to view alarm+detail activity (tablet mode) or
         // alarm and detail activities (phone mode)
         final PendingIntent viewAlarm;
@@ -476,7 +477,7 @@ public class AlarmController extends BroadcastReceiver {
             notifyIntents[1] = new Intent(context, AlarmDetailActivity.class);
             notifyIntents[1].setAction(ALARM_VIEW);
             alarm.putAlarmId(notifyIntents[1]);
-            viewAlarm = PendingIntent.getActivities(context, alarm.getId(), notifyIntents, PendingIntent.FLAG_UPDATE_CURRENT);
+            viewAlarm = PendingIntent.getActivities(context, (forWidget)? 0 : alarm.getId(), notifyIntents, PendingIntent.FLAG_UPDATE_CURRENT);
         }
         return viewAlarm;
     }

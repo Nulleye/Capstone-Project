@@ -294,4 +294,11 @@
     <string name="cd_more4less">More for less…</string>
 
 
+    <!-- AppWidget -->
+    <string name="appwidget_time">Next alarm time</string>
+    <string name="appwidget_date">Next alarm date</string>
+    <string name="appwidget_no_next_alarm">No next alarm</string>
+    <string name="appwidget_next_alarm">YAAA - Next alarm</string>
+
+
 </resources>
