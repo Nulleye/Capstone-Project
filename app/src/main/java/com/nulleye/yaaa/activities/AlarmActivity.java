@@ -300,7 +300,7 @@ public class AlarmActivity extends AppCompatActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (alarm != null) alarm.putAlarm(outState);
-        if (contentView.getTag() != null) outState.putInt(ANIMATION_PERCENT, (Integer) contentView.getTag());
+        if ((contentView.getTag() != null) && (contentView.getTag() instanceof Integer)) outState.putInt(ANIMATION_PERCENT, (Integer) contentView.getTag());
     }
 
 
