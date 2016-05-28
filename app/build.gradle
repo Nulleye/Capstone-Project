@@ -15,31 +15,31 @@ android {
         vectorDrawables.useSupportLibrary = true
     }
 
-    signingConfigs {
-        release {
-            storeFile file('release.keystore')
-            keyAlias 'yaaa.release'
-            storePassword 'udacity-release'
-            keyPassword 'udacity-release'
-        }
-        debug {
-            storeFile file("debug.keystore")
-            keyAlias 'yaaa.debug'
-            storePassword 'udacity-debug'
-            keyPassword 'udacity-debug'
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file('release.keystore')
+//            keyAlias 'yaaa.release'
+//            storePassword 'udacity-release'
+//            keyPassword 'udacity-release'
+//        }
+//        debug {
+//            storeFile file("debug.keystore")
+//            keyAlias 'yaaa.debug'
+//            storePassword 'udacity-debug'
+//            keyPassword 'udacity-debug'
+//        }
+//    }
 
     buildTypes {
         release {
             //minifyEnabled true
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             debuggable false
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
         }
         debug {
             debuggable true
-            signingConfig signingConfigs.debug
+//            signingConfig signingConfigs.debug
         }
     }
 
