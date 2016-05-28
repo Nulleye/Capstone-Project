@@ -11,13 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.nulleye.yaaa.R;
 import com.nulleye.yaaa.data.Alarm;
 import com.nulleye.yaaa.data.AlarmDbHelper;
 import com.nulleye.yaaa.util.FnUtil;
 import com.nulleye.yaaa.util.SoundHelper;
+import com.nulleye.yaaa.util.external.FileChooserDialogEx;
 
 import java.io.File;
 
@@ -28,8 +28,7 @@ import java.io.File;
  *
  * Created by Cristian Alvarez on 3/5/16.
  */
-public class AlarmDetailActivity extends AppCompatActivity implements
-        FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback {
+public class AlarmDetailActivity extends AppCompatActivity implements SoundHelper.LocalChooser {
 
     private AlarmDetailFragment fragment = null;
 
@@ -91,6 +90,16 @@ public class AlarmDetailActivity extends AppCompatActivity implements
 
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (requestCode > 0)  {
+            doTheThing();
+            requestCode = 0;
+        }
+    }
+
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
@@ -136,15 +145,17 @@ public class AlarmDetailActivity extends AppCompatActivity implements
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     // VERY VERY WEIRD STUFF HERE!!
-    // FileChooserDialog & FolderChooserDialog implementations need an AppCompatActivity that
-    // implements a FolderChooserDialog.FolderCallback & FileChooserDialog.FileCallback!!!!
+    // FileChooserDialogEx & FolderChooserDialog implementations need an AppCompatActivity that
+    // implements a FolderChooserDialog.FolderCallback & FileChooserDialogEx.FileCallback!!!!
     // This forces to do very very weird things, at least two different parameters one for
     // the app and the other for the callback would have been a better approach
     // TODO Make my own implementation of these dialogs
 
     @Override
-    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
+    public void onFileSelection(@NonNull FileChooserDialogEx dialog, @NonNull File file) {
         if (fragment != null) fragment.onFileSelection(dialog, file);
     }
 
@@ -152,6 +163,33 @@ public class AlarmDetailActivity extends AppCompatActivity implements
     @Override
     public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
         if (fragment != null) fragment.onFolderSelection(dialog, folder);
+    }
+
+
+    private int requestCode = 0;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //Relaunch last choose call
+
+        //KNOWN MASHMALLOW BUG: until fixed call this in activity onResume
+        //if (requestCode == SoundHelper.STORAGE_PERMISSION_FILE) SoundHelper.showFileChooser(this, currentSource);
+        //else SoundHelper.showFolderChooser(this, currentSource);
+        this.requestCode = requestCode;
+
+    }
+
+    private void doTheThing() {
+        if (requestCode == SoundHelper.STORAGE_PERMISSION_FILE) SoundHelper.showFileChooser(this, currentSource);
+        else SoundHelper.showFolderChooser(this, currentSource);
+    }
+
+
+    //Temporary holder to store parameters for currrent checkpermissions loop call
+    private String currentSource = null;
+
+    @Override
+    public void setCurrentSource(final String source) {
+        currentSource = source;
     }
 
 

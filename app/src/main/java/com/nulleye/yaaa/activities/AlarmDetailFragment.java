@@ -35,7 +35,6 @@ import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.nulleye.yaaa.R;
 import com.nulleye.yaaa.YaaaApplication;
@@ -48,6 +47,7 @@ import com.nulleye.yaaa.util.NumberFormatter;
 import com.nulleye.yaaa.util.SoundHelper;
 import com.nulleye.yaaa.util.VolumeTransformer;
 import com.nulleye.yaaa.util.WeekDaysHelper;
+import com.nulleye.yaaa.util.external.FileChooserDialogEx;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -67,7 +67,7 @@ import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 public class AlarmDetailFragment extends Fragment implements
         View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener,
         DiscreteSeekBar.OnProgressChangeListener,
-        SoundHelper.OnSoundSelected, FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback {
+        SoundHelper.OnSoundSelected, FolderChooserDialog.FolderCallback, FileChooserDialogEx.FileCallback {
 
     public static String TAG = AlarmDetailFragment.class.getSimpleName();
 
@@ -413,7 +413,7 @@ public class AlarmDetailFragment extends Fragment implements
 
 
     @Override
-    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
+    public void onFileSelection(@NonNull FileChooserDialogEx dialog, @NonNull File file) {
         alarm.setSoundType(Alarm.SoundType.LOCAL_FILE);
         alarm.setSoundSourceTitle(FnUtil.removeFileExtension(file.getName()));
         alarm.setSoundSource(file.getAbsoluteFile().toString());
@@ -555,14 +555,13 @@ public class AlarmDetailFragment extends Fragment implements
     }
 
 
-    private <ActivityTypeFile extends AppCompatActivity & FileChooserDialog.FileCallback,
-            ActivityTypeFolder extends AppCompatActivity & FolderChooserDialog.FolderCallback>
+    private <ActivityType extends AppCompatActivity & SoundHelper.LocalChooser>
         void chooseSoundSource(final Context context, final Alarm.SoundType soundType, final String currentSource) {
         if (soundType.needsSoundSource()) {
             if (soundType.equals(Alarm.SoundType.LOCAL_FILE))
-                SoundHelper.showFileChooser(((ActivityTypeFile)AlarmDetailFragment.this.getActivity()), currentSource);
+                SoundHelper.showFileChooser(((ActivityType)AlarmDetailFragment.this.getActivity()), currentSource);
             else if (soundType.equals(Alarm.SoundType.LOCAL_FOLDER))
-                SoundHelper.showFolderChooser(((ActivityTypeFolder)AlarmDetailFragment.this.getActivity()), currentSource);
+                SoundHelper.showFolderChooser(((ActivityType)AlarmDetailFragment.this.getActivity()), currentSource);
             else SoundHelper.chooseSound(context, AlarmDetailFragment.this, soundType, currentSource);
         } else {
             alarm.setSoundType(soundType);

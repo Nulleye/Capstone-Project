@@ -22,7 +22,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.nulleye.yaaa.AlarmController;
 import com.nulleye.yaaa.R;
@@ -34,6 +33,7 @@ import com.nulleye.yaaa.util.IntervalFormatter;
 import com.nulleye.yaaa.util.NumberFormatter;
 import com.nulleye.yaaa.util.SoundHelper;
 import com.nulleye.yaaa.util.VolumeTransformer;
+import com.nulleye.yaaa.util.external.FileChooserDialogEx;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
@@ -45,7 +45,7 @@ import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 public class SettingsActivity extends AppCompatActivity implements
         View.OnClickListener, CompoundButton.OnCheckedChangeListener,
         DiscreteSeekBar.OnProgressChangeListener,
-        SoundHelper.OnSoundSelected, FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback {
+        SoundHelper.OnSoundSelected, SoundHelper.LocalChooser {
 
     public static String GO_UP = "activity.go.up";
 
@@ -148,6 +148,10 @@ public class SettingsActivity extends AppCompatActivity implements
     public void onResume() {
         super.onResume();
         refreshData(this);
+        if (requestCode > 0)  {
+            doTheThing();
+            requestCode = 0;
+        }
     }
 
 
@@ -274,8 +278,18 @@ public class SettingsActivity extends AppCompatActivity implements
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // VERY VERY WEIRD STUFF HERE!!
+    // FileChooserDialogEx & FolderChooserDialog implementations need an AppCompatActivity that
+    // implements a FolderChooserDialog.FolderCallback & FileChooserDialogEx.FileCallback!!!!
+    // This forces to do very very weird things, at least two different parameters one for
+    // the app and the other for the callback would have been a better approach
+    // TODO Make my own implementation of these dialogs
+
+
     @Override
-    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
+    public void onFileSelection(@NonNull FileChooserDialogEx dialog, @NonNull File file) {
         prefs.setSoundType(Alarm.SoundType.LOCAL_FILE);
         prefs.setSoundSourceTitle(FnUtil.removeFileExtension(file.getName()));
         prefs.setSoundSource(file.getAbsoluteFile().toString());
@@ -292,6 +306,36 @@ public class SettingsActivity extends AppCompatActivity implements
         setSoundType(dialog.getContext());
         setSoundSource(dialog.getContext());
     }
+
+
+    private int requestCode = 0;
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //Relaunch last choose call
+
+        //KNOWN MASHMALLOW BUG: until fixed call this in activity onResume
+        //if (requestCode == SoundHelper.STORAGE_PERMISSION_FILE) SoundHelper.showFileChooser(this, currentSource);
+        //else SoundHelper.showFolderChooser(this, currentSource);
+        this.requestCode = requestCode;
+
+    }
+
+    private void doTheThing() {
+        if (requestCode == SoundHelper.STORAGE_PERMISSION_FILE) SoundHelper.showFileChooser(this, currentSource);
+        else SoundHelper.showFolderChooser(this, currentSource);
+    }
+
+
+    //Temporary holder to store parameters for currrent checkpermissions loop call
+    private String currentSource = null;
+
+    @Override
+    public void setCurrentSource(final String source) {
+        currentSource = source;
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     @Override

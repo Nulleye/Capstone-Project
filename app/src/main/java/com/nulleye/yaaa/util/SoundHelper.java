@@ -19,10 +19,10 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.nulleye.yaaa.R;
 import com.nulleye.yaaa.data.Alarm;
+import com.nulleye.yaaa.util.external.FileChooserDialogEx;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,9 +35,11 @@ import java.util.List;
  */
 public class SoundHelper implements MediaPlayer.OnErrorListener {
 
-    private final static int STORAGE_PERMISSION_RC = 69;
+    public final static int STORAGE_PERMISSION_FILE = 10;
+    public final static int STORAGE_PERMISSION_FOLDER = 11;
 
-    public static String AUDIO_MIME = "audio/*";
+    public static String AUDIO_MIMES = "audio/*;video/*;*/ogg;/*.mp3;*/wav;*/aac;*/mp4;*/mpeg";
+    public static String[] AUDIO_MIMES_ARRAY = AUDIO_MIMES.split(";");
 
     public static MediaPlayer mediaPlayer = null;
 
@@ -207,27 +209,40 @@ public class SoundHelper implements MediaPlayer.OnErrorListener {
     }
 
 
+
+    //Helper interface for file/folder choose and request permissions
+    public interface LocalChooser extends
+            FolderChooserDialog.FolderCallback, FileChooserDialogEx.FileCallback,
+            ActivityCompat.OnRequestPermissionsResultCallback  {
+
+        void setCurrentSource(final String source);
+
+    } //LocalChooser
+
+
+
     // VERY VERY WEIRD STUFF HERE!!
-    // FileChooserDialog & FolderChooserDialog implementations need an AppCompatActivity that
-    // implements a FolderChooserDialog.FolderCallback & FileChooserDialog.FileCallback!!!!
+    // FileChooserDialogEx & FolderChooserDialog implementations need an AppCompatActivity that
+    // implements a FolderChooserDialog.FolderCallback & FileChooserDialogEx.FileCallback!!!!
     // This forces to do very very weird things, at least two different parameters one for
     // the app and the other for the callback would have been a better approach
     // TODO Make my own implementation of these dialogs
 
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public static <ActivityType extends AppCompatActivity & FileChooserDialog.FileCallback>
+    public static <ActivityType extends AppCompatActivity & LocalChooser>
         void showFileChooser(final ActivityType activity, final String currentSource) {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_RC);
+            activity.setCurrentSource(currentSource);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_FILE);
             return;
         }
-        FileChooserDialog.Builder builder = new FileChooserDialog
+        FileChooserDialogEx.Builder builder = new FileChooserDialogEx
                 .Builder(activity)
                 .chooseButton(R.string.btn_choose)
                 .cancelButton(android.R.string.cancel)
-                .mimeType(AUDIO_MIME)
+                .mimeType(AUDIO_MIMES)
                 .tag(SoundHelper.class.getName() + "showFileChooser");
         if (currentSource != null) builder.initialPath(new File(currentSource).getParent());
         builder.build().show(activity);
@@ -235,11 +250,12 @@ public class SoundHelper implements MediaPlayer.OnErrorListener {
 
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public static <ActivityType extends AppCompatActivity & FolderChooserDialog.FolderCallback>
+    public static <ActivityType extends AppCompatActivity & LocalChooser>
         void showFolderChooser(final ActivityType activity, final String currentSource) {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                 PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_RC);
+            activity.setCurrentSource(currentSource);
+            ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_FOLDER);
             return;
         }
         FolderChooserDialog.Builder builder = new FolderChooserDialog
@@ -249,6 +265,20 @@ public class SoundHelper implements MediaPlayer.OnErrorListener {
                 .tag(SoundHelper.class.getName() + "showFolderChooser");
         if (currentSource != null) builder.initialPath(currentSource);
         builder.build().show(activity);
+    }
+
+
+    public static <ActivityType extends AppCompatActivity & LocalChooser>
+        void postChooser(final ActivityType activity, final String currentSource, final int type) {
+        new Runnable() {
+
+            @Override
+            public void run() {
+                if (type == STORAGE_PERMISSION_FILE) showFileChooser(activity, currentSource);
+                else showFolderChooser(activity, currentSource);
+            }
+
+        }.run();
     }
 
 

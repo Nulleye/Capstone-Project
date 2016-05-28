@@ -176,8 +176,8 @@ public class AlarmListActivity extends AppCompatActivity implements
 
 
     // VERY VERY WEIRD STUFF HERE!!
-    // FileChooserDialog & FolderChooserDialog implementations need an AppCompatActivity that
-    // implements a FolderChooserDialog.FolderCallback & FileChooserDialog.FileCallback!!!!
+    // FileChooserDialogEx & FolderChooserDialog implementations need an AppCompatActivity that
+    // implements a FolderChooserDialog.FolderCallback & FileChooserDialogEx.FileCallback!!!!
     // This forces to do very very weird things, at least two different parameters one for
     // the app and the other for the callback would have been a better approach
     // TODO Make my own implementation of these dialogs

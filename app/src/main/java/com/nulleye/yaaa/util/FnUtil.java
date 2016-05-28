@@ -396,41 +396,34 @@ public class FnUtil {
 
 
     public static boolean fileIsMimeType(final File file, final String mimeType) {
-        if (mimeType == null || mimeType.equals("*/*")) {
+        if (mimeType == null || mimeType.equals("*/*") || mimeType.equals("*")) {
             return true;
         } else {
             // get the file mime type
-            String filename = file.toURI().toString();
-            int dotPos = filename.lastIndexOf('.');
-            if (dotPos == -1) {
-                return false;
-            }
-            String fileExtension = filename.substring(dotPos + 1);
-            String fileType = MIME_TYPE_MAP.getMimeTypeFromExtension(fileExtension);
-            if (fileType == null) {
-                return false;
-            }
+            final String filename = file.toURI().toString();
+            final int dotPos = filename.lastIndexOf('.');
+            if (dotPos == -1) return false;
+            final String fileExtension = filename.substring(dotPos + 1);
+            final String fileType = MIME_TYPE_MAP.getMimeTypeFromExtension(fileExtension);
+            if (fileType == null) return false;
+
             // check the 'type/subtype' pattern
-            if (fileType.equals(mimeType)) {
-                return true;
-            }
+            if (fileType.equals(mimeType)) return true;
+
             // check the 'type/*' pattern
-            int mimeTypeDelimiter = mimeType.lastIndexOf('/');
-            if (mimeTypeDelimiter == -1) {
-                return false;
-            }
-            String mimeTypeMainType = mimeType.substring(0, mimeTypeDelimiter);
-            String mimeTypeSubtype = mimeType.substring(mimeTypeDelimiter + 1);
-            if (!mimeTypeSubtype.equals("*")) {
-                return false;
-            }
-            int fileTypeDelimiter = fileType.lastIndexOf('/');
-            if (fileTypeDelimiter == -1) {
-                return false;
-            }
-            String fileTypeMainType = fileType.substring(0, fileTypeDelimiter);
-            if (fileTypeMainType.equals(mimeTypeMainType)) {
-                return true;
+            final int mimeTypeDelimiter = mimeType.lastIndexOf('/');
+            if (mimeTypeDelimiter == -1) return false;
+            final int fileTypeDelimiter = fileType.lastIndexOf('/');
+            if (fileTypeDelimiter == -1) return false;
+            final String mimeTypeMainType = mimeType.substring(0, mimeTypeDelimiter);
+            final String mimeTypeSubtype = mimeType.substring(mimeTypeDelimiter + 1);
+            final String fileypeMainType = fileType.substring(0, fileTypeDelimiter);
+            final String fileTypeSubtype = fileType.substring(fileTypeDelimiter + 1);
+
+            if (mimeTypeMainType.equals("*")) {
+                if (mimeTypeSubtype.equals(fileTypeSubtype)) return true;
+            } else if (mimeTypeMainType.equals(fileypeMainType)) {
+                if (mimeTypeSubtype.equals("*")) return true;
             }
         }
         return false;
@@ -468,7 +461,13 @@ public class FnUtil {
             do {
                 final File file = contents[i];
                 if (file.isDirectory()) recursiveFindFiles(file, files, maxFiles, random);
-                else if (FnUtil.fileIsMimeType(file, SoundHelper.AUDIO_MIME)) files.add(file);
+                else {
+                    for(String mime : SoundHelper.AUDIO_MIMES_ARRAY)
+                        if (FnUtil.fileIsMimeType(file, mime)) {
+                            files.add(file);
+                            break;
+                        }
+                }
                 i = (i + 1) % len;
             } while((files.size() < maxFiles) && (i != initI));
         }
@@ -549,5 +548,6 @@ public class FnUtil {
     public static boolean safeIntEqual(final Object intObject, final int inte) {
         return (intObject != null) && (intObject instanceof Integer) && ((Integer) intObject == inte);
     }
+
 
 }
