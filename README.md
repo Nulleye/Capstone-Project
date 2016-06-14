@@ -5,6 +5,8 @@ This project is part of the Udacity Android online Nano-Degree co-created by Goo
 
 #YAAA (Yet Another Alarm App)
 
+Download it on [Google Play](https://play.google.com/store/apps/details?id=com.nulleye.yaaa)
+
 ![YAAA](preview/yaaa-preview.gif)
 
 ##Capstone, Stage 1 - Design
