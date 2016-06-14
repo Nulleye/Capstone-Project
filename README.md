@@ -7,7 +7,7 @@ This project is part of the Udacity Android online Nano-Degree co-created by Goo
 
 **Download it on [Google Play](https://play.google.com/store/apps/details?id=com.nulleye.yaaa)**
 
-![YAAA](preview/yaaa-preview.gif)(https://play.google.com/store/apps/details?id=com.nulleye.yaaa)
+[![YAAA](preview/yaaa-preview.gif)](https://play.google.com/store/apps/details?id=com.nulleye.yaaa)
 
 ##Capstone, Stage 1 - Design
 Design the app, build the app project plan.
