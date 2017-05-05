@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.plaidapp.ui.widget.ElasticDragDismissFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/draggable_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:dragDismissDistance="@dimen/drag_dismiss_distance"
+    app:dragDismissScale="@dimen/drag_dismiss_scale"
+    android:transitionGroup="false"
+    tools:context="com.nulleye.yaaa.activities.AlarmDetailActivity">
+
+    <include layout="@layout/activity_alarm_detail_common"/>
+
+</io.plaidapp.ui.widget.ElasticDragDismissFrameLayout>

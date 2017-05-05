@@ -21,14 +21,22 @@ import android.widget.TextView;
 
 import com.nulleye.yaaa.AlarmRunner;
 import com.nulleye.yaaa.R;
+import com.nulleye.yaaa.YaaaApplication;
 import com.nulleye.yaaa.data.Alarm;
+import com.nulleye.yaaa.data.YaaaPreferences;
 import com.nulleye.yaaa.util.FnUtil;
+import com.nulleye.yaaa.util.gui.GuiUtil;
 
 import java.util.Calendar;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 /**
  * Alarm activity
+ *
+ * Activity to show hwne alarm rings and the user can Snooze or Stop
  *
  * NOTE: The commented code was made to try to disable navigation and status bars
  * interactions, to force user to respond to the alarm or lock the phone, but this
@@ -47,18 +55,20 @@ public class AlarmActivity extends AppCompatActivity
 
     public static String ANIMATION_PERCENT = "background.percent";
 
+    YaaaPreferences prefs = YaaaApplication.getPreferences();
 
 //    private static final int UI_ANIMATION_DELAY = 300;
 
     private View contentView;
     private Window window;
 
-    private TextView time;
-    private TextView date;
-    private TextView title;
+    @BindView(R.id.time) TextView time;
+    @BindView(R.id.time_ampm) TextView time_ampm;
+    @BindView(R.id.date) TextView date;
+    @BindView(R.id.title)  TextView title;
 
-    private ImageButton snooze;
-    private ImageButton stop;
+    @BindView(R.id.snooze)  ImageButton snooze;
+    @BindView(R.id.stop)  ImageButton stop;
 
     private Alarm alarm;
 
@@ -69,6 +79,9 @@ public class AlarmActivity extends AppCompatActivity
     private int orientation;
 
 
+    /**
+     * Update time text
+     */
     private final BroadcastReceiver timeTicksReceiver =
             new BroadcastReceiver() {
 
@@ -79,6 +92,11 @@ public class AlarmActivity extends AppCompatActivity
 
             };
 
+    /**
+     * Receive messages
+     * If received an explicit ALARM_ACTION_KILL from AlarmRunner the close, any other message
+     * snooze alarm for a while
+     */
     private final BroadcastReceiver screenOffReceiver =
             new BroadcastReceiver() {
 
@@ -108,6 +126,10 @@ public class AlarmActivity extends AppCompatActivity
 //    };
 
 
+    /**
+     * Hide action bars, notifications, etc, make it a Fullscreen app
+     * @param setWindow
+     */
     private void hideSystemUI(final boolean setWindow) {
 
         if (setWindow && (window != null)) {
@@ -162,7 +184,7 @@ public class AlarmActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_alarm);
+        setContentView(R.layout.activity_alarm_play);
         contentView = findViewById(R.id.fullscreen_content);
 
         orientation = this.getResources().getConfiguration().orientation;
@@ -183,12 +205,14 @@ public class AlarmActivity extends AppCompatActivity
         actionMessageSent = false;
 
         //SOUND OFF?
-        silent = alarm.isSilent();
+        silent = alarm.isSilent(prefs);
         if (!silent) {
             final AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
             if ((audioManager != null) && (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) == 0))
                 silent = true;
         }
+        //If alarm is silent or we cannot get access to audiomanager then use silent alarm, so
+        //"Blink the screen" using a value animator
         if (silent) {
             final int colorFrom = ContextCompat.getColor(this, R.color.colorPrimary);
             final int colorTo = ContextCompat.getColor(this, R.color.colorButtonNormal);
@@ -202,8 +226,9 @@ public class AlarmActivity extends AppCompatActivity
                 public void onAnimationUpdate(ValueAnimator animator) {
                     try {
                         contentView.setBackgroundColor((int) animator.getAnimatedValue());
-                        int lum = FnUtil.perceptiveLuminance((int) animator.getAnimatedValue());
+                        int lum = GuiUtil.perceptiveLuminance((int) animator.getAnimatedValue());
                         time.setTextColor(lum);
+                        time_ampm.setTextColor(lum);
                         date.setTextColor(lum);
                         title.setTextColor(lum);
                     } catch(Exception ignore) {};
@@ -237,7 +262,7 @@ public class AlarmActivity extends AppCompatActivity
         // Checks the orientation of the screen
         if (orientation != newConfig.orientation) {
             orientation = newConfig.orientation;
-            setContentView(R.layout.activity_alarm);
+            setContentView(R.layout.activity_alarm_play);
             contentView = findViewById(R.id.fullscreen_content);
             setupUI();
         }
@@ -245,18 +270,15 @@ public class AlarmActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Setup UI controls
+     */
     private void setupUI() {
-
         window = getWindow();
-
         hideSystemUI(true);
 
-        time = (TextView) findViewById(R.id.time);
-        date = (TextView) findViewById(R.id.date);
-        title = (TextView) findViewById(R.id.title);
-        title.setText(alarm.getTitle(this));
-
-        snooze = (ImageButton) findViewById(R.id.snooze);
+        ButterKnife.bind(this);
+        title.setText(alarm.getTitleDef(this));
         snooze.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -265,8 +287,6 @@ public class AlarmActivity extends AppCompatActivity
             }
 
         });
-
-        stop = (ImageButton) findViewById(R.id.stop);
         stop.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -280,10 +300,14 @@ public class AlarmActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Update time text
+     */
     private void updateTime() {
         final Calendar current = Calendar.getInstance();
         try {
-            time.setText(FnUtil.formatTime(this, FnUtil.TimeFormat.TIME, current));
+            time.setText(FnUtil.formatTime(this, FnUtil.TimeFormat.TIME2, current));
+            time_ampm.setText((FnUtil.is24HourMode(this))? "" : FnUtil.formatTimeAMPM(this, current));
             date.setText(FnUtil.formatTime(this, FnUtil.TimeFormat.WEEK_DAY_MONTH, current));
         } catch (Exception ignore) {}
     }
@@ -307,6 +331,7 @@ public class AlarmActivity extends AppCompatActivity
     @Override
     public void onDestroy() {
         super.onDestroy();
+        //Unregister receivers and snooze if no other action has been taken
         unregisterReceiver(screenOffReceiver);
         unregisterReceiver(timeTicksReceiver);
         if (!actionMessageSent) snooze(false);
@@ -326,6 +351,11 @@ public class AlarmActivity extends AppCompatActivity
 //    }
 
 
+    /**
+     * Get key presses to snooze alarm
+     * @param event
+     * @return
+     */
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         // Do this on key down to handle a few of the system keys.
@@ -349,13 +379,17 @@ public class AlarmActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         // Don't allow back to dismiss. This method is overriden by AlarmAlert
-        // so that the dialog is dismissed.
+        // so that the mySettingsHelperDialog is dismissed.
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    /**
+     * Snooze butyon pressed, send action to AlarmRunner
+     * @param finish
+     */
     private void snooze(final boolean finish) {
         actionMessageSent = true;
         final Intent intent = new Intent(this, AlarmRunner.class);
@@ -366,6 +400,9 @@ public class AlarmActivity extends AppCompatActivity
     }
 
 
+    /**
+     * Stop button pressed, send action to AlarmRunner
+     */
     private void stop() {
         actionMessageSent = true;
         final Intent intent = new Intent(this, AlarmRunner.class);

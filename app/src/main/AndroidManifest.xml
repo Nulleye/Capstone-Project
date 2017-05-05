@@ -10,6 +10,18 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
+    <!--
+    IF ENABLE THIS THEN ADD PRIVACY POLICY SCREEN OR WEB_LINK
+
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_STATS"/>
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    -->
     <!-- <uses-permission android:name="android.permission.DEVICE_POWER" /> -->
     <application
         android:name=".YaaaApplication"
@@ -46,23 +58,75 @@
         <activity
             android:name=".activities.AlarmListActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
+            android:exported="true"
             android:label="@string/title_alarm_list"
-            android:launchMode="singleInstance"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity-alias
+            android:name=".Launcher"
+            android:label="@string/app_name"
+            android:targetActivity=".activities.AlarmListActivity">
             <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-                <category android:name="android.intent.category.DESK_DOCK"/>
+                <!-- <category android:name="android.intent.category.DESK_DOCK"/> -->
             </intent-filter>
+        </activity-alias>
+
+        <activity
+            android:name=".HandleApiCalls"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:permission="com.android.alarm.permission.SET_ALARM"
+            android:taskAffinity=""
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.SET_ALARM"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.VOICE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DISMISS_ALARM"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.VOICE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SNOOZE_ALARM"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.VOICE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SHOW_ALARMS"/>
+
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.VOICE"/>
+            </intent-filter>
+            <!--
+                <intent-filter>
+                <action android:name="android.intent.action.SET_TIMER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+            -->
         </activity>
+
+        <activity-alias
+            android:name=".HandleSetAlarm"
+            android:exported="true"
+            android:targetActivity=".HandleApiCalls">
+        </activity-alias>
+
         <activity
             android:name=".activities.AlarmDetailActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
             android:label="@string/title_alarm_detail"
-            android:launchMode="singleInstance"
             android:parentActivityName=".activities.AlarmListActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.AlarmDetail">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.nulleye.yaaa.activities.AlarmListActivity"/>
@@ -71,31 +135,39 @@
             android:name=".activities.SettingsActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|navigation"
             android:label="@string/title_activity_settings"
-            android:launchMode="singleInstance"
+            android:taskAffinity=""
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activities.AlarmActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_alarm"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.Transparent">
         </activity>
         <activity
             android:name=".activities.AboutActivity"
             android:label="@string/title_activity_about"
+            android:parentActivityName=".activities.SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.nulleye.yaaa.activities.SettingsActivity"/>
         </activity>
 
-        <receiver android:name=".NextAlarmWidget"
-                  android:label="@string/appwidget_next_alarm">
+        <receiver
+            android:name=".NextAlarmWidget"
+            android:label="@string/appwidget_next_alarm">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/next_alarm_info"/>
         </receiver>
 
+        <activity android:name=".activities.HandleApiCalls">
+        </activity>
     </application>
 
 </manifest>

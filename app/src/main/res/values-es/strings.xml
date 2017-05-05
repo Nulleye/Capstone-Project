@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="language">es</string>
+
+    <!-- APPLICATION -->
+    <string name="app_name">YAAA</string>
+    <string name="action_settings">Preferencias</string>
+    <string name="action_about">Acerca de</string>
+    <string name="title_alarm_list">YAAA alarmas</string>
+    <string name="title_activity_settings">Preferencias</string>
+    <string name="title_activity_alarm">Alarma</string>
+    <string name="title_alarm_detail">Detalles de la alarma</string>
+    <string name="title_activity_about">Acerca de YAAA</string>
+
+
+    <!-- ALARM -->
+
+    <!-- Days of week -->
+    <string name="every_day">todos los días</string>
+    <string name="never">nunca</string>
+    <string name="day_concat">", "</string>
+
+    <!-- Next ring texts -->
+    <string name="today">hoy</string>
+    <string name="was_today">era hoy</string>
+    <string name="tomorrow">mañana</string>
+    <string name="yesterday">ayer</string>
+    <string name="was_yesterday">fue ayer</string>
+    <string name="next_ring_message">Próx.: %s</string>
+    <string name="next_ring_vacation_message">Planeado para %s pero desactivado por vacaciones</string>
+    <string name="passed_date">pasado %s</string>
+    <string name="fmt_weekday_time">EEEE \'a las\' %s</string>
+    <string name="fmt_weekday_day_time">EEEE, d \'a las\' %s</string>
+    <string name="fmt_weekday_day_month_time">EEEE, d MMMM \'a las\' %s</string>
+    <string name="fmt_weekday_day_month_year_time">EEEE, d MMMM \'del\' yyyy \'a las\' %s</string>
+    <string name="fmt_weekday">EEEE</string>
+    <string name="fmt_weekday_day">EEEE, d</string>
+    <string name="fmt_weekday_day_month">EEEE, d MMMM</string>
+    <string name="fmt_weekday_day_month_year">EEEE, d MMMM \'del\' yyyy</string>
+    <string name="text_time">\'%1$s a las\' %2$s</string>
+    <string name="day_and">" y "</string>
+    <string name="day_to">" a "</string>
+
+    <!-- Date config summary -->
+    <string name="only_date">solo %s</string>
+    <string name="daily_from">diaria desde %s</string>
+    <string name="monthly_from">mensual desde %s</string>
+    <string name="annual_from">anual desde %s</string>
+    <string name="hoursminutes">cada %s</string>
+
+    <string name="timeinterval_sep_double">%1$s y %2$s</string>
+    <string name="timeinterval_sep_triple">%1$s, %2$s y %3$s</string>
+    <string name="timeinterval_sep_quadruple">%1$s, %2$s, %3$s y %4$s</string>
+
+
+    <!-- NOTIFICATIONS -->
+    <string name="dismiss_alarm">"Descartar alarma"</string>
+    <string name="wake_times_in"> y %1$s en %2$s</string>
+    <plurals name="wake_retries">
+        <item quantity="one">%d intento</item>
+        <item quantity="other">%d intentos</item>
+    </plurals>
+
+    <!-- ALARM LIST SCREEN -->
+    <string name="press_plus_to_add_alarm">Pulsa el botón para añadir una alarma</string>
+    <string name="swipe_to_delete">Desliza a izquierda o derecha para eliminar una alarma</string>
+
+
+    <!-- ALARM TITLE -->
+    <string name="hint_title">Sin título</string>
+    <string name="title">Título</string>
+    <string name="default_title">Sin título</string>
+
+    <!-- ALARM TIME -->
+    <string name="hint_time">hora de la alarma</string>
+    <string name="time">Hora</string>
+
+    <!-- ALARM REPETITION -->
+    <string name="hint_repetition">repetición de la alarma</string>
+    <string name="repetition">Repetición</string>
+    <string-array name="repetition">
+        <item>Ninguna</item>
+        <item>Semanal</item>
+        <item>Diaria</item>
+        <item>Mensual</item>
+        <item>Anual</item>
+        <item>Intervalo</item>
+    </string-array>
+    <string name="select_repetition">Modo de repetition</string>
+
+    <!-- Interval -->
+    <string name="interval">Intervalo</string>
+    <string name="interval_days">Días</string>
+    <string name="interval_hours">Horas</string>
+    <string name="interval_minutes">Minutos</string>
+    <string name="interval_seconds">Segundos</string>
+
+    <!-- ALARM DATE -->
+    <string name="hint_date">fecha</string>
+    <string name="date">Fecha</string>
+    <string name="choose_date">Escoger fecha</string>
+
+    <!-- SOUND TYPE -->
+    <string name="hint_sound_type">sonido</string>
+    <string name="sound_type">Sonido</string>
+    <string-array name="sound_type">
+        <item>Preferencias</item>
+        <item>Ninguno</item>
+        <item>Tono</item>
+        <item>Notificación</item>
+        <item>Alarma</item>
+        <item>Canción</item>
+        <item>Artista / Álbum (carpeta)</item>
+    </string-array>
+    <string-array name="sound_type_prefs">
+        <item>Ninguno</item>
+        <item>Tono</item>
+        <item>Notificación</item>
+        <item>Alarma</item>
+        <item>Canción</item>
+        <item>Artista / Álbum (carpeta)</item>
+    </string-array>
+    <string name="sound_type_none">Ninguno</string>
+    <string name="select_sound_type">Escoge un tipo de sonido</string>
+    <string name="select_sound">Escoge un sonido</string>
+    <string name="select_ringtone">Escoge un tono</string>
+    <string name="select_notification">Escoge una notificación</string>
+    <string name="select_alarm">Escoge una alarma</string>
+    <string name="select_folder">Escoge una carpeta</string>
+    <string name="select_song">Escoge una canción</string>
+    <string name="hint_sound_source">origen del sonido</string>
+    <string name="song_not_found">%s no encontrado</string>
+    <string name="songs_not_found">%s no tiene canciones</string>
+    <string name="folder_go_up">...</string>
+    <string name="path">Ruta</string>
+
+    <!-- VOLUME -->
+    <string name="volume">Volumen</string>
+    <string name="hint_volume">volumen</string>
+    <string name="vibrate">Vibrar</string>
+    <string name="hint_vibrate">vibrar</string>
+    <string name="volume_default">Pref.</string>
+    <string name="volume_disabled">Silencio</string>
+
+    <!-- GRADUAL VOLUME -->
+    <string name="gradual_interval">Volumen\ngradual</string>
+    <string name="hint_gradual_interval">volumen gradual</string>
+    <plurals name="interval_second">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
+    <string name="interval_second_redux">%d s</string>
+    <string name="gradual_volume">Volumen gradual</string>
+
+    <!-- WAKE TIMES -->
+    <string name="wake_verification">Verificación\ndespierto</string>
+    <string name="wake_retries">intentos</string>
+    <string name="hint_wake_retries">intentos</string>
+    <string name="wake_interval">intervalo</string>
+    <string name="hint_wake_interval">intervalo</string>
+    <string name="wake_verification_retries">Intentos</string>
+    <string name="wake_verification_interval">Intervalo</string>
+    <string name="wake_verification_dialog">Verificación despierto</string>
+    <string name="wake_retries_in">%1$s en %2$s</string>
+
+    <!-- DELETE ALARM -->
+    <string name="autodelete_alarm">Eliminar alarma automáticamente</string>
+    <string name="hint_autodelete_alarm">auto-eliminar alarma</string>
+    <string name="autodelete_alarm_done">Cuando finalize</string>
+    <string name="hint_autodelete_alarm_done">cuando cinalize</string>
+    <string name="autodelete_alarm_after">Después de</string>
+    <string name="hint_autodelete_alarm_after">después</string>
+    <string name="hint_autodelete_alarm_after_date">después de la fecha</string>
+    <string name="autodelete_has_effect">La alarma es repetitiva, esta opción no tiene efecto.</string>
+
+    <!-- DELETE ALARM -->
+    <string name="ignore_vacation_period">Ignorar períodos de vacaciones</string>
+    <string name="hint_ignore_vacation_period">ignorar períodos de vacaciones</string>
+    <string name="see_settings">Ver Preferencias</string>
+
+    <!-- BUTTONS -->
+    <string name="btn_dismiss">Descartar</string>
+    <string name="btn_undo">Deshacer</string>
+    <string name="btn_choose">Escoger</string>
+    <string name="btn_ok">Aceptar</string>
+    <string name="btn_cancel">Cancelar</string>
+
+
+    <!-- PREFERENCES -->
+    <string name="vacation_period">Período de vacaciones desde ahora hasta</string>
+    <string name="hint_vacation_period">período de vacaciones desde ahora hasta</string>
+    <string name="hint_vacation_period_date">fecha</string>
+    <string name="no_final_date_defined">Escoger fecha</string>
+    <string name="vacation_period_exp">Desactivar alarmas hasta la fecha,
+        excepto para alarmas con <b>Ignorar períodos de vacaciones</b>.</string>
+    <string name="vacation_period_dialog">Fecha final vacaciones</string>
+
+    <string name="notification_interval">Intervalo de\nnotificación</string>
+    <string name="hint_notification_interval">intervalo de notificación</string>
+    <string name="notification_interval_exp">Aparecerá una notificación antes de que una alarma suene,
+        donde podrás descartar esa repetición.</string>
+    <string name="notification_interval_dialog">Intervalo de notificación</string>
+
+    <string name="snooze_interval">Intervalo\nde dormitar</string>
+    <string name="hint_snooze_interval">intervalo de dormitar</string>
+    <string name="snooze_interval_dialog">Intervalo de dormitar</string>
+
+    <string name="alarm_defaults">Preferencias de las alarmas</string>
+
+    <!-- interval picker -->
+    <string name="default_value">Preferencias</string>
+    <string name="disabled_value">Deshabilitado</string>
+    <plurals name="interval_minute">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+    <string name="interval_minute_redux">%d min</string>
+    <plurals name="interval_hour">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
+    <string name="interval_hour_redux">%d h</string>
+
+    <string name="default_format">Pref. (%s)</string>
+    <string name="default_format2">Pref.: %s</string>
+
+    <plurals name="interval_day">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+    <string name="interval_day_redux">%d d</string>
+
+
+    <!-- next alarm summary -->
+    <string name="next_scheduled_alarm">%1$s en %2$s</string>
+    <string name="no_next_scheduled_alarm">No hay siguiente planificaciónm</string>
+
+
+    <!-- Alarm -->
+    <string name="btn_snooze">Dormitar</string>
+    <string name="btn_stop">Parar</string>
+
+
+    <!-- About -->
+    <string name="by_nulleye">by <b>nulleye</b></string>
+    <string name="web_nulleye"><a href="http://www.nulleye.com">www.nulleye.com</a></string>
+    <string name="web_github"><a href="http://github.com/Nulleye">Github</a></string>
+    <string name="web_linkedin"><a href="http://www.linkedin.com/in/cristianalvarezplanas">linkedIn</a></string>
+    <string name="web_privacy">Leer la <a href="http://www.nulleye.com/privacy">Política de privacidad</a></string>
+    <string name="udacity_text">Una versión <b>Pro</b> de esta app está en desarrollo, e incluirá:</string>
+    <string name="pro_text1">Un diseño específico para <b>Tablets</b>.</string>
+    <string name="pro_text2">Múltiples <b>pantallas de alarma</b> como, \'<b>Mover el teléfono</b> para Dormitar y <b>Botón aleatorio</b>
+        para Parar\', o \'<b>Modo consciente</b> - solucionar un problema para Parar\'.</string>
+    <string name="pro_text3">Multiples fuentes de sonido online, como <b>Spotify</b>, <b>Radios</b> online, <b>Google Play Music</b>, etc.</string>
+
+    <string name="thanks_to">Esta app no hubiera sido posible sin la inestimable contribución de estos filántropos del mundo del <b>Open Source</b>:</string>
+
+    <string name="contrib1"><b>Aidan Follestad</b> por sus diálogos Material <a href="http://github.com/afollestad/material-dialogs">github.com/afollestad/material-dialogs</a></string>
+    <string name="contrib2"><b>Ander Webbs</b> por su rápida DiscreteSeekBar Material <a href="http://github.com/AnderWeb/discreteSeekBar">github.com/AnderWeb/discreteSeekBar</a></string>
+    <string name="contrib3"><b>Kasual Business</b> por su diálogo NumberPicker Material <a href="http://github.com/KasualBusiness/MaterialNumberPicker">github.com/KasualBusiness/MaterialNumberPicker</a></string>
+    <string name="contrib4">Y al <b>Android Open Source Project</b> por todo lo demás <a href="http://source.android.com/">source.android.com</a></string>
+
+
+    <!-- CONTENT DESCRIPTIONS -->
+
+    <!-- Alarm list -->
+    <string name="cd_alarm_time">Hora de la alarma</string>
+    <string name="cd_alarm_time_ampm">Hora de la alarma AM/PM</string>
+    <string name="cd_alarm_title">Título de la alarma</string>
+    <string name="cd_alarm_config_summary">Sumario de la configuración de la alarma</string>
+    <string name="cd_alarm_onoff_switch">Interruptor encendido-apagado</string>
+    <string name="cd_alarm_next_planned_ring">Siguiente planificación de la alarma</string>
+    <string name="cd_undo_alarm_delete">Deshacer la eliminación de esta alarma (3 segundos)</string>
+    <string name="cd_press_plus_button">Pulsa el botón de más para añadir una alarma</string>
+    <string name="cd_click_to_add_alarm">Pulsa para añadir una alarma nueva</string>
+
+    <!-- Alarm detail -->
+    <string name="cd_click_to_choose_alarm_time">Pulsa para escoger la hora de la alarma</string>
+    <string name="cd_click_to_switch_alarm_onoff">Pulsa para habilitar o deshabilitar la alarma</string>
+    <string name="cd_alarm_repetition">Repetición de la alarma</string>
+    <string name="cd_select_alarm_repetition_type">Escoger el tipo de repetición de la alarma: diaria, días de la semana, mensual, etc</string>
+    <string name="cd_hours_minutes">Intervalo de tiempo</string>
+    <string name="cd_select_hours_minutes">Pulsa para seleccionar el intervalo de tiempo (horas:minutos)</string>
+    <string name="cd_alarm_date">Fecha de la alarma</string>
+    <string name="cd_select_alarm_date">Pulsa para seleccionar la fecha de la alarma</string>
+    <string name="cd_click_to_select_first_day_of_week">Pulsa para seleccionar el primer día de la semana</string>
+    <string name="cd_click_to_select_second_day_of_week">Pulsa para seleccionar el segundo día de la semana</string>
+    <string name="cd_click_to_select_third_day_of_week">Pulsa para seleccionar el tercer día de la semana</string>
+    <string name="cd_click_to_select_fourth_day_of_week">Pulsa para seleccionar el cuarto día de la semana</string>
+    <string name="cd_click_to_select_fifth_day_of_week">Pulsa para seleccionar el quinto día de la semana</string>
+    <string name="cd_click_to_select_sixth_day_of_week">Pulsa para seleccionar el sexto día de la semana</string>
+    <string name="cd_click_to_select_seventh_day_of_week">Pulsa para seleccionar el séptimo día de la semana</string>
+    <string name="cd_alarm_soundtype_and_source">Tipo de sonido y origen de la alarma</string>
+    <string name="cd_click_to_choose_soundtype">Pulsa para escoger el tipo de sonido de la alarma</string>
+    <string name="cd_soundtype_random">Sonido de alarma aleatorio</string>
+    <string name="cd_click_to_choose_soundsource">Pulsa para escoger el origen del sonido de la alarma (tono)</string>
+    <string name="cd_alarm_volume_and_vibration">Volumen y vibración de la  alarma</string>
+    <string name="cd_select_volume_level_defto100">Escoger el nivel de volumen: primero Preferencias, segundo Silencio hasta el 100%</string>
+    <string name="cd_alarm_vibration">Habilitar la vibración de la alarma</string>
+    <string name="cd_alarm_default_volume">Volumen por defecto de la alarma</string>
+    <string name="cd_alarm_gradual_volume">Volumen gradual de la alarma</string>
+    <string name="cd_click_to_select_gradual_interval">Pulsa para escoger el intervalo de volumen gradual en segundos</string>
+    <string name="cd_alarm_wake_up_verifications">Verificación despierto</string>
+    <string name="cd_click_to_select_wake_up_verifications">Pulsa para seleccionar el número de veces y el intervalo de tiempo para que se comprueba que se está realmente despierto</string>
+    <string name="cd_auto_delete_alarm">Auto-eliminar alarma</string>
+    <string name="cd_autodelete_when_done">Auto-eliminar alarma cuando finalize</string>
+    <string name="cd_autodelete_for_none">Aviso de auto-eliminar cuando finalize, solo para alarmas no repetitivas</string>
+    <string name="cd_autodelete_after_date">Auto-eliminar después de una fecha</string>
+    <string name="cd_click_to_choose_autodelete_after_date">Pulsa para escoger la fecha de auto-eliminar después de la fecha</string>
+    <string name="cd_alarm_ignores_vacation">La alarma ignora períodos de vacaciones</string>
+    <string name="cd_click_to_save_alarm_and_exit">Pulsa para guardar los camvbios y salir</string>
+
+    <!-- Settings -->
+    <string name="cd_vacation_period">Habilitar períodos de vacaciones</string>
+    <string name="cd_vacation_period_end_date">Perçiodo de vacaciones</string>
+    <string name="cd_choose_final_date_of_vacation">Pulsa para seleccionar la fecha final de tu período de vacaciones</string>
+    <string name="cd_notification_interval">Intervalo de notificación de la alarma</string>
+    <string name="cd_click_to_select_notification_interval">Pulsa para seleccionar el intervalo de la notificación de la alarma en minutos</string>
+    <string name="cd_snooze_interval">Intervalo de dormitar</string>
+    <string name="cd_click_to_select_snooze_interval">Pulsa para seleccionar el intervalo de dormitar en minutos</string>
+
+    <!-- Alarm screen -->
+    <string name="cd_current_time">Hora actual</string>
+    <string name="cd_current_date">Fecha actual</string>
+    <string name="cd_current_alarm_title">Título de la alarma actual</string>
+    <string name="cd_click_to_snooze_alarm">Pulsa para Dormitar la alarma</string>
+    <string name="cd_click_to_stop_alarm">Pulsa para Parar la alarma</string>
+
+    <!-- About -->
+    <string name="cd_nulleye_logo">Nulleye logo</string>
+    <string name="cd_more4less">Mas por menos…</string>
+
+
+    <!-- AppWidget -->
+    <string name="appwidget_time">Siguiente hora de alarma</string>
+    <string name="appwidget_date">Siguiente fecah de alarma</string>
+    <string name="appwidget_no_next_alarm">No hay siguiente alarma</string>
+    <string name="appwidget_next_alarm">YAAA - Siguiente alarma</string>
+
+    <string name="more_apps">Más apps</string>
+
+    <!-- External: com.afollestad.materialdialogs.commons.R -->
+    <string name="md_error_label">Error</string>
+    <string name="md_storage_perm_error">La applicación no ha obtenido permiso para acceder al almacenamiento externo.</string>
+
+
+</resources>

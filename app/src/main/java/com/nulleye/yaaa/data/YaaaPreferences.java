@@ -1,152 +1,153 @@
 package com.nulleye.yaaa.data;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.util.Pair;
 
 import com.nulleye.yaaa.R;
 import com.nulleye.yaaa.YaaaApplication;
+import com.nulleye.yaaa.dialogs.SettingsMaster;
 import com.nulleye.yaaa.util.FnUtil;
-import com.nulleye.yaaa.util.IntervalFormatter;
-import com.nulleye.yaaa.util.NumberFormatter;
-import com.nulleye.yaaa.util.SecondsIntervalFormatter;
-import com.nulleye.yaaa.util.SoundHelper;
-import com.nulleye.yaaa.util.VolumeTransformer;
+import com.nulleye.yaaa.util.formatters.VolumeTransformer;
 
 import java.util.Calendar;
 
+import static com.nulleye.yaaa.data.Alarm.DismissType;
+import static com.nulleye.yaaa.data.Alarm.SoundType;
+import static com.nulleye.yaaa.util.FnUtil.TimeFormat;
+import static com.nulleye.yaaa.util.FnUtil.TimeUnit;
+
 /**
+ * YaaaPreferences
  * Yaaa preferences helper
  *
- * Created by Cristian Alvarez on 30/4/16.
+ * @author Cristian Alvarez Planas
+ * @version 3
+ * 30/4/16
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressLint("CommitPrefEdits")
 public class YaaaPreferences {
 
     private static String HEAD = YaaaApplication.HEAD + "PREF_";
 
-    //PREFERENCES
-    public static String PREFERENCE_VACATION_PERIOD = HEAD + "VACATION_PERIOD";                //boolean
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // PREFERENCES
+
+    //GENERAL PREFERENCES
+    public static String PREFERENCE_VACATION_PERIOD_STATE = HEAD + "VACATION_PERIOD";          //boolean
     public static String PREFERENCE_VACATION_PERIOD_DATE = HEAD + "VACATION_PERIOD_DATE";      //long DATE (UNTIL DATE included)
-    public static String PREFERENCE_NOTIFICATION_INTERVAL = HEAD + "NOTIFICATION_INTERVAL";    //int MINUTES
+
+    public static String PREFERENCE_NOTIFICATION_INTERVAL_STATE = HEAD + "NOTIFICATION_INTERVAL_STATE"; //boolean
+    public static String PREFERENCE_NOTIFICATION_INTERVAL = HEAD + "NOTIFICATION_INTERVAL";             //int MINUTES
+
     public static String PREFERENCE_SNOOZE_INTERVAL = HEAD + "SNOOZE_INTERVAL";                //int MINUTES
+
+    //ALARM DEFAULTS
+    public static String PREFERENCE_SOUND_STATE = HEAD + "SOUND_STATE";                        //boolean
     public static String PREFERENCE_SOUND_TYPE = HEAD + "SOUND_TYPE";                          //int Alarm.SoundType
     public static String PREFERENCE_SOUND_SOURCE_TITLE = HEAD + "SOUND_SOURCE_TITLE";          //String SOUND SOURCE TITLE
     public static String PREFERENCE_SOUND_SOURCE = HEAD + "SOUND_SOURCE";                      //String SOUND SOURCE
+
+    public static String PREFERENCE_VOLUME_STATE = HEAD + "VOLUME_STATE";                      //boolean
     public static String PREFERENCE_VOLUME = HEAD + "VOLUME";                                  //int LEVEL(0 % - 100 %)
     public static String PREFERENCE_VIBRATE = HEAD + "VIBRATE";                                //boolean
+
+    public static String PREFERENCE_GRADUAL_INTERVAL_STATE = HEAD + "GRADUAL_INTERVAL_STATE";  //boolean
     public static String PREFERENCE_GRADUAL_INTERVAL = HEAD + "GRADUAL_INTERVAL";              //int SECONDS
+
+    public static String PREFERENCE_WAKE_TIMES_STATE = HEAD + "WAKE_TIMES_STATE";              //boolean
     public static String PREFERENCE_WAKE_TIMES = HEAD + "WAKE_TIMES";                          //int OCCURRENCES
-    public static String PREFERENCE_WAKE_INTERVAL = HEAD + "WAKE_INTERVAL";                    //int MINUTES
+    public static String PREFERENCE_WAKE_TIMES_INTERVAL = HEAD + "WAKE_TIMES_INTERVAL";        //int MINUTES
+
+    public static String PREFERENCE_DISMISS_TYPE_STATE = HEAD + "DISMISS_TYPE_STATE";          //boolean
     public static String PREFERENCE_DISMISS_TYPE = HEAD + "DISMISS_TYPE";                      //int Alarm.DismissType
 
-    public static String PREFERENCE_SHOW_SWIPE_DELETE = HEAD + "SHOW_SWIPE_DELETE";             //boolean
+    //INTERNAL USE PREFERENCES
+    public static String PREFERENCE_SHOW_SWIPE_DELETE = HEAD + "SHOW_SWIPE_DELETE";             //boolean (show Swipe to delete tip?)
 
-    //PREFERENCES DEFAULTS
-    public static boolean   PREFERENCE_VACATION_PERIOD_DEFAULT = false;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // PREFERENCE DEFAULTS
+
+    //GENERAL PREFERENCES
+    public static boolean   PREFERENCE_VACATION_PERIOD_STATE_DEFAULT = false;
     public static long      PREFERENCE_VACATION_PERIOD_DATE_DEFAULT = Alarm.NO_DATE;
 
-    public static int       PREFERENCE_NOTIFICATION_INTERVAL_DEFAULT = 60;
-        public static int       PREFERENCE_NOTIFICATION_INTERVAL_MIN = 0;       //0=Disabled
-        public static int       PREFERENCE_NOTIFICATION_INTERVAL_MAX = 60*24;   //Minutes
+    public static boolean   PREFERENCE_NOTIFICATION_INTERVAL_STATE_DEFAULT = true;
+    public static int       PREFERENCE_NOTIFICATION_INTERVAL_DEFAULT = 60;  //Minutes
+    public static int       PREFERENCE_NOTIFICATION_INTERVAL_MIN = 5;       //Minutes
+    public static int       PREFERENCE_NOTIFICATION_INTERVAL_MAX = 60*24;   //Minutes
+    public static int[][]   PREFERENCE_NOTIFICATION_INTERVALS =
+            { {60, 5} , {120, 10} , {PREFERENCE_NOTIFICATION_INTERVAL_MAX, 30} };
 
-    public static int       PREFERENCE_SNOOZE_INTERVAL_DEFAULT = 10;
-        public static int       PREFERENCE_SNOOZE_INTERVAL_MIN = 1;
-        public static int       PREFERENCE_SNOOZE_INTERVAL_MAX = 60*24; //Minutes
+    public static int       PREFERENCE_SNOOZE_INTERVAL_DEFAULT = 10;    //Minutes
+    public static int       PREFERENCE_SNOOZE_INTERVAL_MIN = 5;         //Minutes
+    public static int       PREFERENCE_SNOOZE_INTERVAL_MAX = 60*6;      //Minutes
+    public static int[][]   PREFERENCE_SNOOZE_INTERVALS =
+            { {60, 5} , {120, 10} , {PREFERENCE_SNOOZE_INTERVAL_MAX, 15} };
 
-    public static Alarm.SoundType   PREFERENCE_SOUND_TYPE_DEFAULT = Alarm.SoundType.ALARM;
-    public static String    PREFERENCE_SOUND_SOURCE_TITLE_DEFAULT = null;
-    public static String    PREFERENCE_SOUND_SOURCE_DEFAULT = null;
+    //ALARM DEFAULTS
+    public static boolean       PREFERENCE_SOUND_STATE_DEFAULT = true;
+    public static SoundType     PREFERENCE_SOUND_TYPE_DEFAULT = Alarm.DEFAULT_SOUND_TYPE;
+    public static String        PREFERENCE_SOUND_SOURCE_TITLE_DEFAULT = Alarm.DEFAULT_SOUND_SOURCE_TITLE;
+    public static String        PREFERENCE_SOUND_SOURCE_DEFAULT = Alarm.DEFAULT_SOUND_SOURCE;
 
-    public static int       PREFERENCE_VOLUME_DEFAULT = 75;
-        public static int       PREFERENCE_VOLUME_MAX = 100;
-        public static int       PREFERENCE_VOLUME_MIN = 0;
-    public static boolean   PREFERENCE_VIBRATE_DEFAULT = false;
+    public static boolean   PREFERENCE_VOLUME_STATE_DEFAULT = true;
+    public static int       PREFERENCE_VOLUME_DEFAULT = Alarm.DEFAULT_VOLUME;
+    public static boolean   PREFERENCE_VIBRATE_DEFAULT = Alarm.DEFAULT_VIBRATE;
 
-    public static int       PREFERENCE_GRADUAL_INTERVAL_DEFAULT = 15;
-        public static int       PREFERENCE_GRADUAL_INTERVAL_MAX = 60*5; //Seconds
+    public static boolean   PREFERENCE_GRADUAL_INTERVAL_STATE_DEFAULT = false;
+    public static int       PREFERENCE_GRADUAL_INTERVAL_DEFAULT = Alarm.DEFAULT_GRADUAL_INTERVAL;
 
-    public static int       PREFERENCE_WAKE_TIMES_DEFAULT = 0;
-        public static int       PREFERENCE_WAKE_TIMES_MAX = 99;
-    public static int       PREFERENCE_WAKE_INTERVAL_DEFAULT = 30;
-        public static int       PREFERENCE_WAKE_TIMES_INTERVAL_MAX = 60*6; //Minutes
+    public static boolean   PREFERENCE_WAKE_TIMES_STATE_DEFAULT = false;
+    public static int       PREFERENCE_WAKE_TIMES_DEFAULT = Alarm.DEFAULT_WAKE_TIMES;
+    public static int       PREFERENCE_WAKE_TIMES_INTERVAL_DEFAULT = Alarm.DEFAULT_WAKE_TIMES_INTERVAL;
 
-    public static Alarm.DismissType   PREFERENCE_DISMISS_TYPE_DEFAULT = Alarm.DismissType.SWIPE_LEFTRIGHT;
+    public static DismissType   PREFERENCE_DISMISS_TYPE_DEFAULT = Alarm.DEFAULT_DISMISS_TYPE;
 
+    //INTERNAL USE PREFERENCES
     public static boolean   PREFERENCE_SHOW_SWIPE_DELETE_DEFAULT = true;
 
+
     private SharedPreferences prefs;
+
     private Context context;
 
-    private IntervalFormatter prefsIntervalFormatter;
-    private IntervalFormatter intervalFormatter;
-
-    private NumberFormatter prefsNumberFormatter;
-    private NumberFormatter numberFormatter;
-
-    private SecondsIntervalFormatter prefsSecondsFormatter;
-    private SecondsIntervalFormatter secondsFormatter;
-
     private VolumeTransformer volumeTransformer;
+
 
     public YaaaPreferences(final Context context) {
         this.context = context;
         prefs = context.getSharedPreferences(YaaaApplication.PACKAGE, Context.MODE_PRIVATE);
 
-        prefsIntervalFormatter = new IntervalFormatter(context).setDisabledValue(true);
-        intervalFormatter = new IntervalFormatter(context).setDisabledValue(true).setDefaultValue(true);
-
-        prefsNumberFormatter = new NumberFormatter(context).setDisabledValue(true);
-        numberFormatter = new NumberFormatter(context).setDisabledValue(true).setDefaultValue(true);
-
-        prefsSecondsFormatter = new SecondsIntervalFormatter(context).setDisabledValue(true);
-        secondsFormatter = new SecondsIntervalFormatter(context).setDisabledValue(true).setDefaultValue(true);
-
-        volumeTransformer = new VolumeTransformer(context).setDisabledValue(true).setDefaultValue(true);
+        volumeTransformer = new VolumeTransformer(context).setDisabledFeature(true).setDefaultFeature(true);
     }
 
-
-    public IntervalFormatter getPrefsIntervalFormatter() {
-        return prefsIntervalFormatter;
-    }
-
-    public IntervalFormatter getIntervalFormatter() {
-        return intervalFormatter;
-    }
-
-    public NumberFormatter getPrefsNumberFormatter() {
-        return prefsNumberFormatter;
-    }
-
-    public NumberFormatter getNumberFormatter() {
-        return numberFormatter;
-    }
-
-
-    public SecondsIntervalFormatter getPrefsSecondsFormatter() {
-        return prefsSecondsFormatter;
-    }
-
-    public SecondsIntervalFormatter getSecondsFormatter() {
-        return secondsFormatter;
-    }
 
     public VolumeTransformer getVolumeTransformer() {
         return volumeTransformer;
     }
 
 
-    //PREFERENCE_VACATION_PERIOD
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //GENERAL PREFERENCES
 
-    public YaaaPreferences setVacationPeriod(final boolean enable) {
+
+    //PREFERENCE_VACATION_PERIOD_STATE
+
+    public YaaaPreferences setVacationPeriodState(final boolean enable) {
         final SharedPreferences.Editor editor = prefs.edit();
-        editor.putBoolean(PREFERENCE_VACATION_PERIOD, enable);
+        editor.putBoolean(PREFERENCE_VACATION_PERIOD_STATE, enable);
         editor.commit();
         return this;
     }
 
-    public boolean isVacationPeriod() {
-        return prefs.getBoolean(PREFERENCE_VACATION_PERIOD, PREFERENCE_VACATION_PERIOD_DEFAULT);
+    public boolean isVacationPeriodState() {
+        return prefs.getBoolean(PREFERENCE_VACATION_PERIOD_STATE, PREFERENCE_VACATION_PERIOD_STATE_DEFAULT);
     }
+
 
     //PREFERENCE_VACATION_PERIOD_DATE
 
@@ -174,7 +175,7 @@ public class YaaaPreferences {
     public String getVacationPeriodDateText() {
         final Calendar cal = getVacationPeriodCalendar();
         if (cal == null) return context.getString(R.string.no_final_date_defined);
-        else return FnUtil.formatTime(context, FnUtil.TimeFormat.DATE, cal);
+        else return FnUtil.formatTime(context, TimeFormat.DATE, cal);
     }
 
     public boolean isVacationPeriodDate(final Calendar time) {
@@ -192,6 +193,20 @@ public class YaaaPreferences {
     }
 
 
+    //PREFERENCE_NOTIFICATION_INTERVAL_STATE
+
+    public YaaaPreferences setNotificationIntervalState(final boolean enable) {
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PREFERENCE_NOTIFICATION_INTERVAL_STATE, enable);
+        editor.commit();
+        return this;
+    }
+
+    public boolean isNotificationIntervalState() {
+        return prefs.getBoolean(PREFERENCE_NOTIFICATION_INTERVAL_STATE, PREFERENCE_NOTIFICATION_INTERVAL_STATE_DEFAULT);
+    }
+
+
     //PREFERENCE_NOTIFICATION_INTERVAL
 
     public YaaaPreferences setNotificationInterval(final int interval) {
@@ -206,7 +221,9 @@ public class YaaaPreferences {
     }
 
     public String getNotificationIntervalText() {
-        return prefsIntervalFormatter.formatReal(getNotificationInterval());
+        return (isNotificationIntervalState())?
+                FnUtil.formatTimeInterval(context, TimeUnit.MINUTE, getNotificationInterval(), true, false) :
+                context.getString(R.string.disabled_value);
     }
 
 
@@ -224,23 +241,47 @@ public class YaaaPreferences {
     }
 
     public String getSnoozeIntervalText() {
-        return prefsIntervalFormatter.formatReal(getSnoozeInterval());
+        return FnUtil.formatTimeInterval(context, TimeUnit.MINUTE, getSnoozeInterval(), true, false);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //ALARM DEFAULTS
+
+
+    //PREFERENCE_NOTIFICATION_INTERVAL_STATE
+
+    public YaaaPreferences setSoundState(final boolean enable) {
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PREFERENCE_SOUND_STATE, enable);
+        editor.commit();
+        return this;
+    }
+
+    public boolean isSoundState() {
+        return prefs.getBoolean(PREFERENCE_SOUND_STATE, PREFERENCE_SOUND_STATE_DEFAULT);
     }
 
 
     //PREFERENCE_SOUND_TYPE
 
-    public YaaaPreferences setSoundType(final Alarm.SoundType soundType) {
+    public YaaaPreferences setSoundType(final SoundType soundType) {
         final SharedPreferences.Editor editor = prefs.edit();
         editor.putInt(PREFERENCE_SOUND_TYPE, soundType.getValue());
         editor.commit();
         return this;
     }
 
-    public Alarm.SoundType getSoundType() {
-        return Alarm.SoundType.getSoundType(
+    public SoundType getSoundType() {
+        return SoundType.getSoundType(
                 prefs.getInt(PREFERENCE_SOUND_TYPE, PREFERENCE_SOUND_TYPE_DEFAULT.getValue()));
     }
+
+    public String getSoundTypeText() {
+        return context.getResources().getStringArray(R.array.sound_type_prefs)[getSoundType().getValue()]
+                .replaceAll("(\\s*(\\(|-).*\\Z)","");
+    }
+
 
     //PREFERENCE_SOUND_SOURCE_TITLE
 
@@ -252,16 +293,17 @@ public class YaaaPreferences {
     }
 
     public String getSoundSourceTitle() {
-        if (!getSoundType().equals(Alarm.SoundType.NONE)) {
+        if (isSoundState()) {
             String title = prefs.getString(PREFERENCE_SOUND_SOURCE_TITLE, PREFERENCE_SOUND_SOURCE_TITLE_DEFAULT);
             if (FnUtil.isSame(title, PREFERENCE_SOUND_SOURCE_TITLE_DEFAULT)) {
-                Pair<String, String> defaultAlarm = SoundHelper.getDefaultAlarm(context);
+                Pair<String, String> defaultAlarm = SettingsMaster.getDefaultAlarm(context);
                 if (defaultAlarm != null) title = defaultAlarm.first;
             }
             return title;
         }
         return context.getString(R.string.sound_type_none);
     }
+
 
     //PREFERENCE_SOUND_SOURCE
 
@@ -275,12 +317,27 @@ public class YaaaPreferences {
     public String getSoundSource() {
         String title = prefs.getString(PREFERENCE_SOUND_SOURCE, PREFERENCE_SOUND_SOURCE_DEFAULT);
         if (FnUtil.isSame(title, PREFERENCE_SOUND_SOURCE_DEFAULT)) {
-            Pair<String, String> defaultAlarm = SoundHelper.getDefaultAlarm(context);
+            Pair<String, String> defaultAlarm = SettingsMaster.getDefaultAlarm(context);
             if (defaultAlarm != null) title = defaultAlarm.second;
         }
         return title;
 
     }
+
+
+    //PREFERENCE_VOLUME_STATE
+
+    public YaaaPreferences setVolumeState(final boolean enable) {
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PREFERENCE_VOLUME_STATE, enable);
+        editor.commit();
+        return this;
+    }
+
+    public boolean isVolumeState() {
+        return prefs.getBoolean(PREFERENCE_VOLUME_STATE, PREFERENCE_VOLUME_STATE_DEFAULT);
+    }
+
 
     //PREFERENCE_VOLUME
 
@@ -299,6 +356,7 @@ public class YaaaPreferences {
         return getVolumeTransformer().transformToString(getVolumeTransformer().getVolume(getVolume()) );
     }
 
+
     //PREFERENCE_VIBRATE
 
     public YaaaPreferences setVibrate(final boolean vibrate) {
@@ -311,6 +369,21 @@ public class YaaaPreferences {
     public boolean isVibrate() {
         return prefs.getBoolean(PREFERENCE_VIBRATE, PREFERENCE_VIBRATE_DEFAULT);
     }
+
+
+    //PREFERENCE_GRADUAL_INTERVAL_STATE
+
+    public YaaaPreferences setGradualIntervalState(final boolean enable) {
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PREFERENCE_GRADUAL_INTERVAL_STATE, enable);
+        editor.commit();
+        return this;
+    }
+
+    public boolean isGradualIntervalState() {
+        return prefs.getBoolean(PREFERENCE_GRADUAL_INTERVAL_STATE, PREFERENCE_GRADUAL_INTERVAL_STATE_DEFAULT);
+    }
+
 
     //PREFERENCE_GRADUAL_INTERVAL
 
@@ -326,7 +399,35 @@ public class YaaaPreferences {
     }
 
     public String getGradualIntervalText() {
-        return getSecondsFormatter().formatReal(getGradualInterval());
+        return (isGradualIntervalState())?
+                FnUtil.formatTimeInterval(context, TimeUnit.SECOND, getGradualInterval(), true, false) :
+                context.getString(R.string.disabled_value);
+    }
+
+    public YaaaPreferences setGradualInterval(final int minutes, final int seconds) {
+        return setGradualInterval((minutes * 60) + seconds);
+    }
+
+    public int getGradualIntervalMinutesPart() {
+        return (int) FnUtil.getTimeIntervalPart(TimeUnit.SECOND, getGradualInterval(), TimeUnit.MINUTE);
+    }
+
+    public int getGradualIntervalSecondsPart() {
+        return (int) FnUtil.getTimeIntervalPart(TimeUnit.SECOND, getGradualInterval(), TimeUnit.SECOND);
+    }
+
+
+    //PREFERENCE_WAKE_TIMES_STATE
+
+    public YaaaPreferences setWakeTimesState(final boolean enable) {
+        final SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean(PREFERENCE_WAKE_TIMES_STATE, enable);
+        editor.commit();
+        return this;
+    }
+
+    public boolean isWakeTimesState() {
+        return prefs.getBoolean(PREFERENCE_WAKE_TIMES_STATE, PREFERENCE_WAKE_TIMES_STATE_DEFAULT);
     }
 
 
@@ -343,48 +444,46 @@ public class YaaaPreferences {
         return prefs.getInt(PREFERENCE_WAKE_TIMES, PREFERENCE_WAKE_TIMES_DEFAULT);
     }
 
-    public boolean isDisabledWakeTimes() {
-        return (getWakeTimes() == 0);
-    }
-
-    public String getWakeTimesText() {
-        return getNumberFormatter().formatReal(getWakeTimes());
-    }
 
     //PREFERENCE_WAKE_INTERVAL
 
-    public YaaaPreferences setWakeInterval(final int wakeInterval) {
+    public YaaaPreferences setWakeTimesInterval(final int wakeInterval) {
         final SharedPreferences.Editor editor = prefs.edit();
-        editor.putInt(PREFERENCE_WAKE_INTERVAL, wakeInterval);
+        editor.putInt(PREFERENCE_WAKE_TIMES_INTERVAL, wakeInterval);
         editor.commit();
         return this;
     }
 
-    public int getWakeInterval() {
-        return prefs.getInt(PREFERENCE_WAKE_INTERVAL, PREFERENCE_WAKE_INTERVAL_DEFAULT);
+    public int getWakeTimesInterval() {
+        return prefs.getInt(PREFERENCE_WAKE_TIMES_INTERVAL, PREFERENCE_WAKE_TIMES_INTERVAL_DEFAULT);
     }
 
-    public String getWakeIntervalText() {
-        return getIntervalFormatter().formatReal(getWakeInterval());
+    public String getWakeTimesIntervalText() {
+        return (isWakeTimesState())?
+                context.getString(R.string.wake_retries_in,
+                        context.getResources().getQuantityString(R.plurals.wake_retries, getWakeTimes(), getWakeTimes()),
+                        FnUtil.formatTimeInterval(context, TimeUnit.MINUTE, getWakeTimesInterval(), true, false)) :
+                context.getString(R.string.disabled_value);
     }
+
 
     //PREFERENCE_DISMISS_TYPE
 
-    public YaaaPreferences seDismissType(final Alarm.DismissType dismissType) {
+    public YaaaPreferences setDismissType(final DismissType dismissType) {
         final SharedPreferences.Editor editor = prefs.edit();
         editor.putInt(PREFERENCE_DISMISS_TYPE, dismissType.getValue());
         editor.commit();
         return this;
     }
 
-    public Alarm.DismissType getDismissType() {
-        return Alarm.DismissType.getDismissType(
+    public DismissType getDismissType() {
+        return DismissType.getDismissType(
                 prefs.getInt(PREFERENCE_DISMISS_TYPE, PREFERENCE_DISMISS_TYPE_DEFAULT.getValue()));
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // EXTRA PREFERENCES
+    // INTERNAL USE PREFERENCES
 
     public YaaaPreferences setShowSwipeDelete(final boolean show) {
         SharedPreferences.Editor editor = prefs.edit();

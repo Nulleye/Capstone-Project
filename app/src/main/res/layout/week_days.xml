@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:id="@+id/week_days"
-              android:paddingBottom="@dimen/line_2sep"
-    >
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
 
     <ToggleButton
         android:layout_width="@dimen/weekday_big"
         android:layout_height="@dimen/weekday_big"
         android:id="@+id/day1"
-        android:textColor="@drawable/round_button_text"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/round_button_text"
         android:background="@drawable/round_button"
         android:height="@dimen/weekday_big"
         android:width="@dimen/weekday_big"
         android:adjustViewBounds="true"
         android:focusableInTouchMode="false"
-        style="?android:attr/buttonBarButtonStyle"
         android:contentDescription="@string/cd_click_to_select_first_day_of_week"
         android:focusable="true"
         />
@@ -32,8 +29,7 @@
         android:layout_width="@dimen/weekday_big"
         android:layout_height="@dimen/weekday_big"
         android:id="@+id/day2"
-        android:textColor="@drawable/round_button_text"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/round_button_text"
         android:background="@drawable/round_button"
         android:height="@dimen/weekday_big"
         android:width="@dimen/weekday_big"
@@ -52,8 +48,7 @@
         android:layout_width="@dimen/weekday_big"
         android:layout_height="@dimen/weekday_big"
         android:id="@+id/day3"
-        android:textColor="@drawable/round_button_text"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/round_button_text"
         android:background="@drawable/round_button"
         android:height="@dimen/weekday_big"
         android:width="@dimen/weekday_big"
@@ -72,8 +67,7 @@
         android:layout_width="@dimen/weekday_big"
         android:layout_height="@dimen/weekday_big"
         android:id="@+id/day4"
-        android:textColor="@drawable/round_button_text"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/round_button_text"
         android:background="@drawable/round_button"
         android:height="@dimen/weekday_big"
         android:width="@dimen/weekday_big"
@@ -92,8 +86,7 @@
         android:layout_width="@dimen/weekday_big"
         android:layout_height="@dimen/weekday_big"
         android:id="@+id/day5"
-        android:textColor="@drawable/round_button_text"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/round_button_text"
         android:background="@drawable/round_button"
         android:height="@dimen/weekday_big"
         android:width="@dimen/weekday_big"
@@ -112,8 +105,7 @@
         android:layout_width="@dimen/weekday_big"
         android:layout_height="@dimen/weekday_big"
         android:id="@+id/day6"
-        android:textColor="@drawable/round_button_text"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/round_button_text"
         android:background="@drawable/round_button"
         android:height="@dimen/weekday_big"
         android:width="@dimen/weekday_big"
@@ -132,8 +124,7 @@
         android:layout_width="@dimen/weekday_big"
         android:layout_height="@dimen/weekday_big"
         android:id="@+id/day7"
-        android:textColor="@drawable/round_button_text"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/round_button_text"
         android:background="@drawable/round_button"
         android:height="@dimen/weekday_big"
         android:width="@dimen/weekday_big"
@@ -143,4 +134,9 @@
         android:focusable="true"
         />
 
-</LinearLayout>
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"/>
+
+</merge>

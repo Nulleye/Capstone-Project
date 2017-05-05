@@ -1,60 +1,53 @@
 package com.nulleye.yaaa.activities;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.NestedScrollView;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
 import com.nulleye.yaaa.R;
 import com.nulleye.yaaa.YaaaApplication;
 import com.nulleye.yaaa.data.Alarm;
 import com.nulleye.yaaa.data.AlarmDbHelper;
 import com.nulleye.yaaa.data.YaaaPreferences;
+import com.nulleye.yaaa.dialogs.LocalDialog;
+import com.nulleye.yaaa.dialogs.SettingsMaster;
 import com.nulleye.yaaa.util.FnUtil;
-import com.nulleye.yaaa.util.IntervalFormatter;
-import com.nulleye.yaaa.util.NumberFormatter;
-import com.nulleye.yaaa.util.SoundHelper;
-import com.nulleye.yaaa.util.VolumeTransformer;
-import com.nulleye.yaaa.util.WeekDaysHelper;
-import com.nulleye.yaaa.util.external.FileChooserDialogEx;
+import com.nulleye.yaaa.util.formatters.VolumeTransformer;
+import com.nulleye.yaaa.util.gui.GuiUtil;
+import com.nulleye.yaaa.util.gui.TransitionUtil;
+import com.nulleye.yaaa.util.helpers.WeekDaysHelper;
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.adw.library.widgets.discreteseekbar.DiscreteSeekBar;
 
-import java.io.File;
-import java.util.Calendar;
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
-import biz.kasual.materialnumberpicker.MaterialNumberPicker;
+import static com.nulleye.yaaa.data.Alarm.AlarmRepetition;
+import static com.nulleye.yaaa.data.Alarm.SettingState;
+
 
 /**
  * Alarm detail fragment
@@ -62,62 +55,98 @@ import biz.kasual.materialnumberpicker.MaterialNumberPicker;
  * Used in AlarmDetailActivity for narrow devices (phones) or
  * in AlarmListActivity, in two pane mode, for wide devices (tables)
  *
- * Created by Cristian Alvarez on 3/5/16.
+ * Created by Cristian Alvarez Planas on 3/5/16.
  */
 public class AlarmDetailFragment extends Fragment implements
-        View.OnClickListener, CompoundButton.OnCheckedChangeListener, AdapterView.OnItemSelectedListener,
-        DiscreteSeekBar.OnProgressChangeListener,
-        SoundHelper.OnSoundSelected, FolderChooserDialog.FolderCallback, FileChooserDialogEx.FileCallback {
+        View.OnClickListener, CompoundButton.OnCheckedChangeListener, DiscreteSeekBar.OnProgressChangeListener,
+        SettingsMaster.SettingsMasterListener {
 
     public static String TAG = AlarmDetailFragment.class.getSimpleName();
 
-    private YaaaPreferences prefs = YaaaApplication.getPreferences();
+    YaaaPreferences prefs = YaaaApplication.getPreferences();
 
-    private static final boolean forceTablet = false;
-    private CollapsingToolbarLayout appBarLayout;
+    //Force tablet mode (unused by now)
+    static final boolean forceTablet = false;
 
-    private Alarm alarm = null;
+    Unbinder unbinder;
+    View rootView;
 
-    private View rootView;
+    LinearLayout actionbar_time_row = null;
+    TextView actionbar_time_h = null;
+    TextView actionbar_time_m = null;
+    TextView actionbar_time_ampm = null;
+    TextView actionbar_subtitle = null;
+    SwitchCompat actionbar_onoff = null;
 
-    private TextView actionbar_title = null;
-    private TextView actionbar_subtitle = null;
-    private Switch actionbar_onoff = null;
+    LinearLayout time_row = null;
+    TextView time_h = null;
+    TextView time_m = null;
+    TextView time_ampm = null;
+    SwitchCompat onoff = null;
+    TextView next_ring = null;
 
-    private TextView time = null;
-    private TextView next_ring = null;
-    private Switch onoff = null;
+    @BindView(R.id.title_row) LinearLayout title_row;
+//    @BindView(R.id.title) EditText title;
+    @BindView(R.id.title) TextView title;
 
-    private EditText title;
+    @BindView(R.id.repetition_row) TableRow repetition_row;
+    @BindView(R.id.repetition_text) TextView repetition_text;
+    @BindView(R.id.repetition_icon) ImageView repetition_icon;
+    @BindView(R.id.repetition) TextView repetition;
 
-    private Spinner repetition;
+    @BindView(R.id.week_days_row) TableRow week_days_row;
+    @BindView(R.id.week_days) LinearLayout week_days;
+    @BindView(R.id.day1) ToggleButton day1;
+    @BindView(R.id.day2) ToggleButton day2;
+    @BindView(R.id.day3) ToggleButton day3;
+    @BindView(R.id.day4) ToggleButton day4;
+    @BindView(R.id.day5) ToggleButton day5;
+    @BindView(R.id.day6) ToggleButton day6;
+    @BindView(R.id.day7) ToggleButton day7;
+    WeekDaysHelper weekDaysHelperController;
 
-    private LinearLayout week_days;
-    private WeekDaysHelper weekDaysHelperController;
+    @BindView(R.id.date_row) TableRow date_row;
+    @BindView(R.id.date_text) TextView date_text;
+    @BindView(R.id.date_icon) ImageView date_icon;
+    @BindView(R.id.date) TextView date;
 
-    private TableRow choose_date;
-    private TextView date;
+    @BindView(R.id.interval_row) TableRow interval_row;
+    @BindView(R.id.interval_text) TextView interval_text;
+    @BindView(R.id.interval_icon) ImageView interval_icon;
+    @BindView(R.id.interval) TextView interval;
 
-    private TextView sound_type;
-    private TextView sound_source;
+    @BindView(R.id.sound_type_row) TableRow sound_type_row;
+    @BindView(R.id.sound_type) TextView sound_type;
+    @BindView(R.id.sound_type_random) ImageView sound_type_random;
+    @BindView(R.id.sound_source) TextView sound_source;
 
-    private DiscreteSeekBar volume;
-    private CheckBox vibrate;
-    private TextView volume_default;
-    private TextView gradual_interval;
+    @BindView(R.id.volume) DiscreteSeekBar volume;
+    @BindView(R.id.vibrate) CheckBox vibrate;
+    @BindView(R.id.volume_default) TextView volume_default;
 
-    private TextView wake_times;
-    private TextView wake_interval;
-    private TableRow wake_interval_block;
+    @BindView(R.id.gradual_interval_row) TableRow gradual_interval_row;
+    @BindView(R.id.gradual_interval) TextView gradual_interval;
 
-    private CheckBox autodelete_alarm;
-    private TableRow autodelete_alarm_block;
-    private RadioButton autodelete_alarm_done;
-    private RadioButton autodelete_alarm_after;
-    private TextView autodelete_alarm_after_date;
-    private TextView autodelete_message;
+    @BindView(R.id.wake_times_interval_row) TableRow wake_times_interval_row;
+    @BindView(R.id.wake_times_interval) TextView wake_times_interval;
 
-    private CheckBox ignore_vacation;
+    @BindView(R.id.autodelete_row) TableRow autodelete_row;
+    @BindView(R.id.autodelete) CheckBox autodelete;
+
+    @BindView(R.id.autodelete_content_row) LinearLayout autodelete_content_row;
+    @BindView(R.id.autodelete_done) RadioButton autodelete_done;
+    @BindView(R.id.autodelete_message) TextView autodelete_message;
+    @BindView(R.id.autodelete_after) RadioButton autodelete_after;
+    @BindView(R.id.autodelete_after_date) TextView autodelete_after_date;
+
+    @BindView(R.id.ignore_vacation_row) TableRow ignore_vacation_row;
+    @BindView(R.id.ignore_vacation) CheckBox ignore_vacation;
+    @BindView(R.id.ignore_vacation_settings) FrameLayout ignore_vacation_settings;
+
+    Typeface robotoTypeface;
+
+    //Current alarm data
+    Alarm alarm = null;
 
 
     public Alarm getAlarm() {
@@ -126,17 +155,17 @@ public class AlarmDetailFragment extends Fragment implements
 
 
     public boolean saveAlarm() {
-        return AlarmDbHelper.saveAlarm(this.getContext(), alarm);
+        return AlarmDbHelper.saveAlarm(this.getContext(), prefs, alarm);
     }
 
 
-    public AlarmDetailFragment() {}
+    public AlarmDetailFragment() {
+    }
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (savedInstanceState != null) alarm = Alarm.getAlarm(savedInstanceState);
         else alarm = Alarm.getAlarm(getArguments());
         if (alarm == null) alarm = new Alarm(); //New alarm!
@@ -148,115 +177,107 @@ public class AlarmDetailFragment extends Fragment implements
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
 
-        rootView = inflater.inflate(R.layout.alarm_detail, container, false);
-        final Context context = this.getContext();
+        rootView = inflater.inflate(R.layout.activity_alarm_detail_list, container, false);
+        unbinder = ButterKnife.bind(this, rootView);
+
+        robotoTypeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Roboto-Light.ttf");
+
         final AppCompatActivity activity = (AppCompatActivity) this.getActivity();
 
         final Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.detail_toolbar);
         if (appBarLayout != null) {
-            actionbar_title = (TextView) activity.findViewById(R.id.actionbar_title);
-            if (actionbar_title != null) actionbar_title.setOnClickListener(this);
+            actionbar_time_row = (LinearLayout) activity.findViewById(R.id.actionbar_time_row);
+            if (actionbar_time_row != null) actionbar_time_row.setOnClickListener(this);
+            actionbar_time_h = (TextView) activity.findViewById(R.id.actionbar_time_h);
+            if (actionbar_time_h != null) actionbar_time_h.setTypeface(robotoTypeface);
+            actionbar_time_m = (TextView) activity.findViewById(R.id.actionbar_time_m);
+            if (actionbar_time_m != null) {
+                actionbar_time_m.setTypeface(robotoTypeface);
+                actionbar_time_m.setOnClickListener(this);
+            }
+            actionbar_time_ampm = (TextView) activity.findViewById(R.id.actionbar_time_ampm);
+            if (actionbar_time_ampm != null) actionbar_time_ampm.setTypeface(robotoTypeface);
             actionbar_subtitle = (TextView) activity.findViewById(R.id.actionbar_subtitle);
 
             //TODO DISABLE THIS IS DEBUG ONLY!
             //if (actionbar_subtitle != null) actionbar_subtitle.setOnClickListener(this);
 
-            actionbar_onoff = (Switch) activity.findViewById(R.id.actionbar_onoff);
+            actionbar_onoff = (SwitchCompat) activity.findViewById(R.id.actionbar_onoff);
             if (actionbar_onoff != null) actionbar_onoff.setOnCheckedChangeListener(this);
         }
 
-        //TIME / NEXT RING / ON-OFF
+        //SPECIAL: ONLY FOR TABLET MODE (TIME / NEXT RING / ON-OFF)
         if (!forceTablet && (appBarLayout != null)) {
             final LinearLayout tablet_time_onoff = (LinearLayout) rootView.findViewById(R.id.tablet_time_onoff);
             tablet_time_onoff.setVisibility(View.GONE);
         } else {
-            time = (TextView) rootView.findViewById(R.id.time);
-            time.setOnClickListener(this);
+            time_row = (LinearLayout) rootView.findViewById(R.id.time_row);
+            if (time_row != null) time_row.setOnClickListener(this);
+            time_h = (TextView) rootView.findViewById(R.id.time_h);
+            if (time_h != null) time_h.setTypeface(robotoTypeface);
+            time_m = (TextView) rootView.findViewById(R.id.time_m);
+            if (time_m != null) {
+                time_m.setTypeface(robotoTypeface);
+                time_m.setOnClickListener(this);
+            }
+            time_ampm = (TextView) rootView.findViewById(R.id.time_ampm);
+            if (time_ampm != null) time_ampm.setTypeface(robotoTypeface);
+            onoff = (SwitchCompat) rootView.findViewById(R.id.onoff);
+            if (onoff != null) onoff.setOnCheckedChangeListener(this);
             next_ring = (TextView) rootView.findViewById(R.id.next_ring);
-            onoff = (Switch) rootView.findViewById(R.id.onoff);
-            onoff.setOnCheckedChangeListener(this);
         }
 
         //TITLE
-        title = (EditText) rootView.findViewById(R.id.title);
-        title.addTextChangedListener(new TextWatcher() {
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                final String text = s.toString();
-                alarm.setTitle((FnUtil.isVoid(text)) ? null : text.trim());
-            }
-
-        });
+        title_row.setOnClickListener(this);
 
         // REPETITION
-        repetition = (Spinner) rootView.findViewById(R.id.repetition);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context,
-                R.array.repetition, R.layout.spinner_item);
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
-        repetition.setAdapter(adapter);
-        repetition.setOnItemSelectedListener(this);
+        repetition_row.setOnClickListener(this);
 
-        // WEEK DAYS | DATE
-        week_days = (LinearLayout) rootView.findViewById(R.id.week_days);
-        weekDaysHelperController = new WeekDaysHelper(this, week_days, alarm, 1);
-        choose_date = (TableRow) rootView.findViewById(R.id.choose_date);
-        date = (TextView) rootView.findViewById(R.id.date);
-        date.setOnClickListener(this);
+        // WEEK DAYS | DATE | INTERVAL
+        weekDaysHelperController = new WeekDaysHelper(getActivity(), this, week_days, alarm, 1);
+        week_days_row.setOnClickListener(this);
+        date_row.setOnClickListener(this);
+        interval_row.setOnClickListener(this);
 
         // SOUND TYPE / SOUND SOURCE
-        sound_type = (TextView) rootView.findViewById(R.id.sound_type);
-        sound_type.setOnClickListener(this);
-        sound_source = (TextView) rootView.findViewById(R.id.sound_source);
+        sound_type_row.setOnClickListener(this);
         sound_source.setOnClickListener(this);
 
         //VOLUME / VIBRATE
-        volume = (DiscreteSeekBar) rootView.findViewById(R.id.volume);
-        setupVolume(context);
-        volume_default = (TextView) rootView.findViewById(R.id.volume_default);
-        vibrate = (CheckBox) rootView.findViewById(R.id.vibrate);
+        setupVolume();
         vibrate.setOnCheckedChangeListener(this);
 
-
         //VOLUME INTERVAL
-        gradual_interval = (TextView) rootView.findViewById(R.id.gradual_interval);
-        gradual_interval.setOnClickListener(this);
+        gradual_interval_row.setOnClickListener(this);
 
         //WAKE UP VERIFICATION
-        wake_times = (TextView) rootView.findViewById(R.id.wake_times);
-        wake_times.setOnClickListener(this);
-        wake_interval = (TextView) rootView.findViewById(R.id.wake_interval);
-        wake_interval.setOnClickListener(this);
-        wake_interval_block = (TableRow) rootView.findViewById(R.id.wake_interval_block);
+        wake_times_interval_row.setOnClickListener(this);
 
         //AUTODELETE
-        autodelete_alarm = (CheckBox) rootView.findViewById(R.id.autodelete_alarm);
-        autodelete_alarm.setOnCheckedChangeListener(this);
-        autodelete_alarm_block = (TableRow) rootView.findViewById(R.id.autodelete_alarm_block);
-        autodelete_alarm_done = (RadioButton) rootView.findViewById(R.id.autodelete_alarm_done);
-        //autodelete_alarm_done.setOnClickListener(this);
-        autodelete_alarm_done.setOnCheckedChangeListener(this);
-        autodelete_alarm_after = (RadioButton) rootView.findViewById(R.id.autodelete_alarm_after);
-        //autodelete_alarm_after.setOnClickListener(this);
-        autodelete_alarm_after.setOnCheckedChangeListener(this);
-        autodelete_alarm_after_date = (TextView) rootView.findViewById(R.id.autodelete_alarm_after_date);
-        autodelete_alarm_after_date.setOnClickListener(this);
-        autodelete_message = (TextView) rootView.findViewById(R.id.autodelete_message);
+        //TODO a autodelete_row?
+        autodelete.setOnCheckedChangeListener(this);
+        //autodelete_done.setOnClickListener(this);
+        autodelete_done.setOnCheckedChangeListener(this);
+        //autodelete_after.setOnClickListener(this);
+        autodelete_after.setOnCheckedChangeListener(this);
+        autodelete_after_date.setOnClickListener(this);
 
         //IGNORE VACATIONS
-        ignore_vacation = (CheckBox) rootView.findViewById(R.id.ignore_vacation);
+        //TODO a ignore_vacation_row?
         ignore_vacation.setOnCheckedChangeListener(this);
+        ignore_vacation_settings.setOnClickListener(this);
 
-        //refreshData(context);
+        if (GuiUtil.enableSpecialAnimations(getContext()) && alarm.hasId())
+            prepareTransitionNames(alarm.getId());
+
         return rootView;
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 
 
@@ -270,8 +291,23 @@ public class AlarmDetailFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        refreshData(this.getContext());
+        onSettingResult(SettingsMaster.SettingType.ALARM_ALL, SettingsMaster.SettingResult.CHANGED, null);
     }
+
+
+    @SuppressWarnings("unchecked")
+    protected <ActivityType extends Activity & SettingsMaster.SettingsMasterListener>
+    ActivityType getActivityType() {
+        return (ActivityType) getActivity();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    protected <ActivityLocalType extends Activity & SettingsMaster.SettingsMasterListener & LocalDialog.LocalDialogPermission>
+    ActivityLocalType getActivityLocalType() {
+        return (ActivityLocalType) getActivity();
+    }
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,32 +316,40 @@ public class AlarmDetailFragment extends Fragment implements
 
     @Override
     public void onClick(View v) {
-        final Context context = this.getContext();
-        switch(v.getId()) {
-            case R.id.date:
-                chooseDate(context);
+        switch (v.getId()) {
+            case R.id.title_row:
+                SettingsMaster.editTitle(getActivityType(), alarm);
+                break;
+            case R.id.repetition_row:
+                SettingsMaster.chooseRepetition(getActivityType(), alarm);
+                break;
+            case R.id.date_row:
+                SettingsMaster.chooseDate(getActivityType(), alarm);
+                break;
+            case R.id.interval_row:
+                SettingsMaster.chooseInterval(getActivityType(), alarm);
+                break;
+            case R.id.sound_type_row:
+                SettingsMaster.chooseSoundType(getActivityLocalType(), alarm);
                 break;
             case R.id.sound_source:
-                chooseSoundSource(context, alarm.getSoundType(), alarm.getSoundSource());
+                if (alarm.isDefaultSoundState())
+                    SettingsMaster.chooseSoundType(getActivityLocalType(), alarm);
+                else SettingsMaster.chooseSoundSource(getActivityLocalType(), alarm,
+                        alarm.getSoundType(), alarm.getSoundSource());
                 break;
-            case R.id.sound_type:
-                chooseSoundType(context);
+            case R.id.gradual_interval_row:
+                SettingsMaster.chooseGradualInterval(getActivityType(), alarm, prefs);
                 break;
-            case R.id.gradual_interval:
-                chooseGradualInterval(context);
+            case R.id.wake_times_interval_row:
+                SettingsMaster.chooseWakeTimesInterval(getActivityType(), alarm, prefs);
                 break;
-            case R.id.wake_times:
-                chooseWakeTimes(context);
+            case R.id.autodelete_after_date:
+                SettingsMaster.chooseDeleteAfterDate(getActivityType(), alarm);
                 break;
-            case R.id.wake_interval:
-                chooseWakeInterval(context);
-                break;
-//            case R.id.autodelete_alarm_done:
-//            case R.id.autodelete_alarm_after:
-//                switchAlarmDeleteOption(context, v);
-//                break;
-            case R.id.autodelete_alarm_after_date:
-                chooseDeleteAferDate(context);
+
+            case R.id.ignore_vacation_settings:
+                SettingsMaster.gotoSettings(this.getActivity(), v, alarm);
                 break;
 
             //TODO DISABLE THIS IS DEBUG ONLY!
@@ -316,16 +360,21 @@ public class AlarmDetailFragment extends Fragment implements
 //                alarm.putAlarm(intent);
 //                context.sendBroadcast(intent);
 //                break;
-
+            case R.id.week_days_row:
+                //Do nothing
+                break;
+            case R.id.actionbar_time_m:
+            case R.id.time_m:
+                SettingsMaster.chooseTime(getActivityType(), alarm, TimePickerDialog.MINUTE_INDEX);
+                break;
             default:
-                chooseTime(context);
+                SettingsMaster.chooseTime(getActivityType(), alarm, TimePickerDialog.HOUR_INDEX);
         }
     }
 
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        final Context context = this.getContext();
         //Prevent check from firing the first time
         if (buttonView.getTag() != null) {
             if (FnUtil.safeBoolEqual(buttonView.getTag(), isChecked)) {
@@ -334,24 +383,24 @@ public class AlarmDetailFragment extends Fragment implements
             }
             buttonView.setTag(null);
         }
-        switch(buttonView.getId()) {
+        switch (buttonView.getId()) {
             case R.id.vibrate:
                 alarm.setVibrate(isChecked);
                 break;
-            case R.id.autodelete_alarm:
+            case R.id.autodelete:
                 alarm.setDelete(isChecked);
-                setDeleteAlarm(false);
+                onSettingResult(SettingsMaster.SettingType.ALARM_DELETE, SettingsMaster.SettingResult.CHANGED, alarm);
                 break;
-            case R.id.autodelete_alarm_done:
-                switchAlarmDeleteOption(context, (RadioButton) buttonView, isChecked);
+            case R.id.autodelete_done:
+                switchAlarmDeleteOption((RadioButton) buttonView, isChecked);
                 break;
-            case R.id.autodelete_alarm_after:
+            case R.id.autodelete_after:
                 if (alarm.hasDeleteDate())
-                    switchAlarmDeleteOption(context, (RadioButton) buttonView, isChecked);
+                    switchAlarmDeleteOption((RadioButton) buttonView, isChecked);
                 else {
-                    autodelete_alarm_after.setTag(Boolean.FALSE);
-                    autodelete_alarm_after.setChecked(false);
-                    chooseDeleteAferDate(context);
+                    autodelete_after.setTag(Boolean.FALSE);
+                    autodelete_after.setChecked(false);
+                    SettingsMaster.chooseDeleteAfterDate(getActivityType(), alarm);
                 }
                 break;
             case R.id.ignore_vacation:
@@ -360,17 +409,18 @@ public class AlarmDetailFragment extends Fragment implements
                 break;
             default:
                 //On/Off switches or Weekday buttons
-                if (buttonView instanceof Switch) {
+                if (buttonView instanceof SwitchCompat) {
                     //On/Off buttons
                     alarm.setEnabled(isChecked);
                     setOnOff(false);
-                    updateNextRing(context);
+                    updateNextRing();
                 } else {
                     //Week day selection
-                    Integer day = weekDaysHelperController.getButtonDay((ToggleButton) buttonView);
+                    final Integer day = weekDaysHelperController.getButtonDay((ToggleButton) buttonView);
                     if (day != null) {
                         alarm.getWeek().set(day - 1, isChecked);
-                        updateNextRing(context);
+                        alarm.calculateNextRingChanged(getContext(), true);
+                        updateNextRing();
                         checkAutodeleteRepetitive();
                     }
                 }
@@ -378,116 +428,78 @@ public class AlarmDetailFragment extends Fragment implements
     }
 
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        //Prevent spinner from firing the first time
-        if (parent.getTag() != null) {
-            if (FnUtil.safeIntEqual(parent.getTag(), position)) {
-                parent.setTag(null);
-                return;
-            }
-            parent.setTag(null);
-        }
-        final Context context = this.getContext();
-        if (parent.getId() == R.id.repetition) {
-            alarm.setRepetition(Alarm.AlarmRepetition.getAlarmRepetition(repetition.getSelectedItemPosition()));
-            switchRepetition();
-            updateNextRing(context);
-        }
-    }
-
-
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-    }
-
-
-    @Override
-    public void onSoundSelected(final Context context, final Alarm.SoundType alarmType, final Pair<String, String> item) {
-        alarm.setSoundType(alarmType);
-        alarm.setSoundSourceTitle(item.first);
-        alarm.setSoundSource(item.second);
-        setSoundType(context);
-        setSoundSource(context);
-    }
-
-
-    @Override
-    public void onFileSelection(@NonNull FileChooserDialogEx dialog, @NonNull File file) {
-        alarm.setSoundType(Alarm.SoundType.LOCAL_FILE);
-        alarm.setSoundSourceTitle(FnUtil.removeFileExtension(file.getName()));
-        alarm.setSoundSource(file.getAbsoluteFile().toString());
-        setSoundType(dialog.getContext());
-        setSoundSource(dialog.getContext());
-    }
-
-
-    @Override
-    public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
-        alarm.setSoundType(Alarm.SoundType.LOCAL_FOLDER);
-        alarm.setSoundSourceTitle(folder.getName());
-        alarm.setSoundSource(folder.getAbsolutePath());
-        setSoundType(dialog.getContext());
-        setSoundSource(dialog.getContext());
-    }
-
-
-
+    /**
+     * Volume progressbar change
+     *
+     * @param seekBar  The DiscreteSeekBar
+     * @param value    the new value
+     * @param fromUser if the change was made from the user or not
+     */
     @Override
     public void onProgressChanged(DiscreteSeekBar seekBar, int value, boolean fromUser) {
-        if (fromUser) alarm.setVolume(prefs.getVolumeTransformer().getRealVolume(value));
-        refreshVolume(this.getActivity());
-        refreshVibrate(this.getActivity());
+        if (fromUser) {
+            final VolumeTransformer transf = prefs.getVolumeTransformer();
+            if (transf.isDefaultValue(value) || transf.isDisabledValue(value))
+                alarm.setVolumeState(SettingState.getSettingState(value));
+            else alarm.setVolumeState(SettingState.ENABLED);
+            alarm.setVolume(prefs.getVolumeTransformer().getRealVolume(value));
+        }
+        refreshVolume();
+        refreshVibrate();
     }
 
 
     @Override
     public void onStartTrackingTouch(DiscreteSeekBar seekBar) {
-
     }
 
 
     @Override
     public void onStopTrackingTouch(DiscreteSeekBar seekBar) {
-
     }
 
 
-    private void setupVolume(final Context context) {
+    /**
+     * Setup volume progressbar
+     */
+    private void setupVolume() {
+        volume.setMin(VolumeTransformer.DEFAULT_INT_VALUE);
         volume.setOnProgressChangeListener(this);
         volume.setNumericTransformer(prefs.getVolumeTransformer());
-        volume.setScrubberColor(ContextCompat.getColor(context, R.color.colorAccent));
+        volume.setScrubberColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
     }
 
 
-    private void refreshVolume(final Context context) {
-        if (alarm.isDefaultVolume()) {
-            volume.setThumbColor(ContextCompat.getColor(context, R.color.volume_default),
-                    ContextCompat.getColor(context, R.color.volume_default));
-        } else {
-            final int vol = alarm.getVolume();
-            if (vol == VolumeTransformer.DISABLED_INT_VALUE)
-                volume.setThumbColor(ContextCompat.getColor(context, R.color.volume_disabled),
-                        ContextCompat.getColor(context, R.color.volume_disabled));
-            else
-                volume.setThumbColor(ContextCompat.getColor(context, R.color.colorAccent),
-                        ContextCompat.getColor(context, R.color.colorAccentDark));
-        }
+    /**
+     * Change color for the popup hint of the volume progressbar
+     */
+    private void refreshVolume() {
+        if (alarm.isDefaultVolumeState())
+            volume.setThumbColor(ContextCompat.getColor(getContext(), R.color.default_setting),
+                    ContextCompat.getColor(getContext(), R.color.default_setting));
+        else if (alarm.isDisabledVolumeState(prefs))
+            volume.setThumbColor(ContextCompat.getColor(getContext(), R.color.volume_disabled),
+                    ContextCompat.getColor(getContext(), R.color.volume_disabled));
+        else volume.setThumbColor(ContextCompat.getColor(getContext(), R.color.colorAccent),
+                    ContextCompat.getColor(getContext(), R.color.colorAccentDark));
     }
 
 
-    private void refreshVibrate(final Context context) {
+    /**
+     * Refresh vibrate check depending on current volume setting
+     */
+    private void refreshVibrate() {
         final boolean vib;
-        if (alarm.isDefaultVolume()) {
+        if (alarm.isDefaultVolumeState()) {
             if (vibrate.isEnabled()) vibrate.setEnabled(false);
             vib = prefs.isVibrate();
             volume_default.setText(
-                    context.getString(R.string.default_format2, prefs.getVolumeText()));
-            FnUtil.hideShowView(volume_default, true, null);
+                    getContext().getString(R.string.default_format2, prefs.getVolumeText()));
+            GuiUtil.hideShowView(volume_default, true, null, false, null);
         } else {
             if (!vibrate.isEnabled()) vibrate.setEnabled(true);
             vib = alarm.isVibrate();
-            FnUtil.hideShowView(volume_default, false, null);
+            GuiUtil.hideShowView(volume_default, false, null, false, null);
         }
         if (vibrate.isChecked() != vib) {
             vibrate.setTag(vib);
@@ -496,250 +508,158 @@ public class AlarmDetailFragment extends Fragment implements
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // CHOOSERS
-
-
-    private void chooseTime(final Context context) {
-        final TimePickerDialog timePicker = new TimePickerDialog(context,
-                new TimePickerDialog.OnTimeSetListener() {
-
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                        alarm.setTime(selectedHour, selectedMinute);
-                        setTime(context);
-                        updateNextRing(context);
-                    }
-
-                }, alarm.getHour(), alarm.getMinutes(), FnUtil.is24HourMode(context));
-        timePicker.show();
-    }
-
-
-    private void chooseDate(final Context context) {
-        Calendar cal = alarm.getDateAsCalendar();
-        if (cal == null) cal = Calendar.getInstance();
-        final DatePickerDialog datePicker = new DatePickerDialog(context,
-                new DatePickerDialog.OnDateSetListener() {
-
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        alarm.setDate(year, monthOfYear, dayOfMonth);
-                        setDate(context);
-                        updateNextRing(context);
-                    }
-
-                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-        datePicker.show();
-    }
-
-
-    private void chooseSoundType(final Context context) {
-        new MaterialDialog.Builder(context)
-                .title(R.string.select_sound_type)
-                .items(R.array.sound_type)
-                .itemsCallbackSingleChoice( alarm.getSoundType().getValue()+1,
-                        new MaterialDialog.ListCallbackSingleChoice() {
-
-                            @Override
-                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
-                                Alarm.SoundType st = Alarm.SoundType.getSoundType(which-1);
-                                chooseSoundSource(context, st,
-                                        (alarm.getSoundType().equals(st))? alarm.getSoundSource() : null);
-                                return true; // allow selection
-                            }
-
-                        })
-                .negativeText(android.R.string.cancel)
-                .show();
-    }
-
-
-    private <ActivityType extends AppCompatActivity & SoundHelper.LocalChooser>
-        void chooseSoundSource(final Context context, final Alarm.SoundType soundType, final String currentSource) {
-        if (soundType.needsSoundSource()) {
-            if (soundType.equals(Alarm.SoundType.LOCAL_FILE))
-                SoundHelper.showFileChooser(((ActivityType)AlarmDetailFragment.this.getActivity()), currentSource);
-            else if (soundType.equals(Alarm.SoundType.LOCAL_FOLDER))
-                SoundHelper.showFolderChooser(((ActivityType)AlarmDetailFragment.this.getActivity()), currentSource);
-            else SoundHelper.chooseSound(context, AlarmDetailFragment.this, soundType, currentSource);
-        } else {
-            alarm.setSoundType(soundType);
-            setSoundType(context);
-            setSoundSource(context);
-        }
-    }
-
-
-    private void chooseGradualInterval(final Context context) {
-        final NumberFormatter fmt = prefs.getSecondsFormatter();
-        final MaterialNumberPicker mnp =
-                FnUtil.getNumberPicker(context,
-                        fmt.getValue(NumberFormatter.DEFAULT_INT_VALUE),
-                        fmt.getValue(YaaaPreferences.PREFERENCE_GRADUAL_INTERVAL_MAX),
-                        fmt.getValue(alarm.getGradualInterval()), fmt);
-        final AlertDialog dialog = new AlertDialog.Builder(this.getActivity())
-                .setTitle(R.string.gradual_volume)
-                .setView(mnp)
-                .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        alarm.setGradualInterval(fmt.getRealValue(mnp.getValue()));
-                        setGradualInterval(context);
-                    }
-
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .create();
-        FnUtil.changeDialogAppearance(dialog).show();
-    }
-
-
-    private void chooseWakeTimes(final Context context) {
-        final NumberFormatter fmt = prefs.getNumberFormatter();
-        final MaterialNumberPicker mnp =
-                FnUtil.getNumberPicker(context,
-                        fmt.getValue(NumberFormatter.DEFAULT_INT_VALUE),
-                        fmt.getValue(YaaaPreferences.PREFERENCE_WAKE_TIMES_MAX),
-                        fmt.getValue(alarm.getWakeTimes()), fmt);
-        final AlertDialog dialog = new AlertDialog.Builder(this.getActivity())
-                .setTitle(R.string.wake_verification_retries)
-                .setView(mnp)
-                .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        alarm.setWakeTimes(fmt.getRealValue(mnp.getValue()));
-                        setWakeTimes(context);
-                    }
-
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .create();
-        FnUtil.changeDialogAppearance(dialog).show();
-    }
-
-
-    private void chooseWakeInterval(final Context context) {
-        final IntervalFormatter fmt = prefs.getIntervalFormatter();
-        final MaterialNumberPicker mnp =
-                FnUtil.getNumberPicker(context,
-                        fmt.getValue(NumberFormatter.DEFAULT_INT_VALUE),
-                        fmt.getValue(YaaaPreferences.PREFERENCE_WAKE_TIMES_INTERVAL_MAX),
-                        fmt.getValue(alarm.getWakeInterval()), fmt);
-        final AlertDialog dialog = new AlertDialog.Builder(this.getActivity())
-                .setTitle(R.string.wake_verification_interval)
-                .setView(mnp)
-                .setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        alarm.setWakeInterval(fmt.getRealValue(mnp.getValue()));
-                        setWakeInterval(context);
-                    }
-
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .create();
-        FnUtil.changeDialogAppearance(dialog).show();
-    }
-
-
-    private void switchAlarmDeleteOption(final Context context, final RadioButton clickedView, final boolean checked) {
+    /**
+     * Auto delete options controller
+     * @param clickedView Redio object clicked
+     * @param checked Is checked?
+     */
+    private void switchAlarmDeleteOption(final RadioButton clickedView, final boolean checked) {
         if (checked) {
-            if (clickedView.getId() == R.id.autodelete_alarm_done) {
+            if (clickedView.getId() == R.id.autodelete_done) {
                 alarm.setDeleteDone(true);
-                autodelete_alarm_after.setTag(Boolean.FALSE);
-                autodelete_alarm_after.setChecked(false);
+                autodelete_after.setTag(Boolean.FALSE);
+                autodelete_after.setChecked(false);
             } else {
                 alarm.setDeleteDone(false);
-                autodelete_alarm_done.setTag(Boolean.FALSE);
-                autodelete_alarm_done.setChecked(false);
+                autodelete_done.setTag(Boolean.FALSE);
+                autodelete_done.setChecked(false);
             }
             checkAutodeleteRepetitive();
         }
     }
 
 
-    private void chooseDeleteAferDate(final Context context) {
-        Calendar cal = alarm.getDeleteDateAsCalendar();
-        if (cal == null) cal = Calendar.getInstance();
-        final DatePickerDialog datePicker = new DatePickerDialog(context,
-                new DatePickerDialog.OnDateSetListener() {
-
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        alarm.setDeleteDate(year, monthOfYear, dayOfMonth);
-                        setDeleteDate(context);
-                        if (!autodelete_alarm_after.isChecked()) {
-                            alarm.setDeleteDone(false);
-                            setDeleteOption();
-                        }
-                    }
-
-                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-        datePicker.show();
-    }
-
-
+    /**
+     * Show/hide autodelete option has no effect
+     */
     private void checkAutodeleteRepetitive() {
         boolean isRepetitive = alarm.isRepetitive();
-        if (alarm.getRepetition().equals(Alarm.AlarmRepetition.WEEK_DAYS) &&
+        if (alarm.getRepetition().equals(AlarmRepetition.WEEK_DAYS) &&
                 !alarm.getWeek().isRepeatSet()) isRepetitive = false;
+        if (alarm.getRepetition().equals(AlarmRepetition.INTERVAL) &&
+                (alarm.getInterval() == 0)) isRepetitive = false;
         if ((alarm.isDeleteDone() && isRepetitive) && (autodelete_message.getVisibility() != View.VISIBLE))
-            FnUtil.hideShowView(autodelete_message, true, null);
+            GuiUtil.hideShowView(autodelete_message, true, null, true, (NestedScrollView) rootView.getParent());
         else if ((!alarm.isDeleteDone() || !isRepetitive) && (autodelete_message.getVisibility() == View.VISIBLE))
-            FnUtil.hideShowView(autodelete_message, false, null);
+            GuiUtil.hideShowView(autodelete_message, false, null, true, (NestedScrollView) rootView.getParent());
     }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // SET DATA FROM ALARM TO OBJECTS
+    // SET DATA FROM ALARM/PREFERENCES TO ACTIVITY OBJECTS
 
 
-    private void refreshData(final Context context) {
-        setTime(context);
-        setOnOff(true);
-        title.setText(alarm.getTitle());
-        setRepetition(true);
-        setDate(context);
-        switchRepetition();
-        setSoundType(context);
-        setSoundSource(context);
-        setVolume(context); //and vibrate
-        setGradualInterval(context);
-        setWakeTimes(context);
-        setWakeInterval(context);
-        setDeleteAlarm(true);
-        setDeleteOption();
-        setDeleteDate(context);
-        setIgnoreVacation(true);
-        updateNextRing(context);
+    /**
+     * Callback function to receive setting dialog results
+     * @param type Type of setting
+     * @param result Dialog setting result, CHANGED or UNCHANGED
+     * @param alarmOrPrefs Object currently affected (Alarm or Preference object)
+     */
+    @Override
+    public void onSettingResult(final SettingsMaster.SettingType type,
+            final SettingsMaster.SettingResult result, @Nullable final Object alarmOrPrefs) {
+
+        //Ignore "Cancel" events by now
+        if (SettingsMaster.SettingResult.UNCHANGED.equals(result)) return;
+
+        boolean init = false;
+        boolean updateNextRing = false;
+        //Update activity object depending on the setting type changed, or
+        //all for activity initialization
+        switch (type) {
+            case ALARM_ALL:
+                init = true;
+            case ALARM_TIME:
+                setTime();
+                updateNextRing();
+                updateNextRing = true;
+                if (!init) break;
+            case ALARM_ONOFF:
+                setOnOff(init);
+                if (!init) break;
+            case ALARM_TITLE:
+                setTitle();
+                if (!init) break;
+            case ALARM_REPETITION:
+                setRepetition();
+                switchRepetition();
+                if (!updateNextRing) updateNextRing();
+                if (!init) break;
+            case ALARM_DATE:
+                setDate();
+                if (!updateNextRing) updateNextRing();
+                if (!init) break;
+            case ALARM_INTERVAL:
+                setInterval();
+                if (!updateNextRing) updateNextRing();
+                if (!init) break;
+            case ALARM_SOUND_TYPE:
+                setSoundType();
+                setSoundSource();
+                if (!init) break;
+            case ALARM_SOUND_SOURCE:
+                setSoundSource();
+                if (!init) break;
+            case ALARM_VOLUME:
+                setVolume(); //and vibrate
+                if (!init) break;
+            case ALARM_GRADUAL_INTERVAL:
+                setGradualInterval();
+                if (!init) break;
+            case ALARM_WAKE_TIMES:
+                setWakeTimesInterval();
+                if (!init) break;
+            case ALARM_DELETE:
+                setDeleteAlarm(init);
+                if (!init) break;
+            case ALARM_DELETE_AFTER_DATE:
+                setDeleteDate();
+                setDeleteOption();
+                if (!init) break;
+            case ALARM_IGNORE_VACATION:
+                setIgnoreVacation(true);
+                if (!init) break;
+            default:
+                if (!updateNextRing) updateNextRing();
+        }
     }
 
 
-    private void updateNextRing(final Context context) {
-        alarm.calculateNextRingChanged(true);
-        final String text = context.getString(R.string.next_ring_message,
-                alarm.getNextRingText(context, false));
-        if (actionbar_subtitle != null) actionbar_subtitle.setText(text);
-        if (next_ring != null) next_ring.setText(text);
+    /**
+     * Set color text of a setting to "default_setting" if the current value is from defaults
+     * to differentiate a setting from defaults or specific of this alarm without printing a specific
+     * text like "Default( 5 min )" fex., instead we put "5 min" but in "default_setting" color
+     *
+     * @param textView TextView to set color
+     * @param isDefault Set normal or default color
+     */
+    private void setSettingColor(final TextView textView, final boolean isDefault) {
+        if (isDefault)
+            textView.setTextColor(ContextCompat.getColor(this.getActivity(), R.color.default_setting));
+        else textView.setTextColor(GuiUtil.getColorText(this.getActivity()));
     }
 
 
-    private void setTime(final Context context) {
-        final String text = alarm.getTimeText(context);
-        if (actionbar_title != null) actionbar_title.setText(text);
-        if (time != null) time.setText(text);
+    /**
+     * Refresh alarm time objects
+     */
+    private void setTime() {
+        final String[] text = alarm.getTimeTextParts(getContext());
+        if (actionbar_time_h != null) actionbar_time_h.setText(text[0] + text[1]);
+        if (actionbar_time_m != null) actionbar_time_m.setText(text[2]);
+        if (time_h != null) time_h.setText(text[0] + text[1]);
+        if (time_m != null) time_m.setText(text[2]);
+        final String ampm = (FnUtil.is24HourMode(getContext()))? "" :
+                FnUtil.formatTimeAMPM(getContext(), alarm.getTimeAsCalendar());
+        if (actionbar_time_ampm != null) actionbar_time_ampm.setText(ampm);
+        if (time_ampm != null) time_ampm.setText(ampm);
     }
 
 
-    private void setDate(final Context context) {
-        date.setText(alarm.getDateText(context));
-    }
-
-
+    /**
+     * Refresh alarm on/off switches
+     * @param init Activity startup?
+     */
     private void setOnOff(final boolean init) {
         if (actionbar_onoff != null) {
             if (init) actionbar_onoff.setTag(alarm.isEnabled());
@@ -752,140 +672,293 @@ public class AlarmDetailFragment extends Fragment implements
     }
 
 
-    private void setRepetition(final boolean init) {
-        if (init) repetition.setTag(alarm.getRepetition().getValue()); //Prevent spinner from firing the first time
-        repetition.setSelection(alarm.getRepetition().getValue(), false);
+    /**
+     * Refresh alarm title
+     */
+    private void setTitle() {
+        title.setText(alarm.getTitleDef(getContext()));
     }
 
 
+    /**
+     * Refresh alarm repetition
+     */
+    private void setRepetition() {
+        repetition.setText(alarm.getRepetitionText(getContext()));
+    }
+
+
+    /**
+     * Refresh alarm repetition related objects
+     */
     private void switchRepetition() {
-        FnUtil.hideShowView(week_days, (repetition.getSelectedItemPosition() == 1), choose_date);
+        final AlarmRepetition repe = alarm.getRepetition();
+        if (AlarmRepetition.WEEK_DAYS.equals(repe)) {
+            GuiUtil.hideShowView(week_days_row, true, null, false, null);
+            GuiUtil.hideShowView(date_row, false, null, false, null);
+            GuiUtil.hideShowView(interval_row, false, null, false, null);
+        } else if (AlarmRepetition.INTERVAL.equals(repe)) {
+            GuiUtil.hideShowView(week_days_row, false, null, false, null);
+            GuiUtil.hideShowView(date_row, false, null, false, null);
+            GuiUtil.hideShowView(interval_row, true, null, false, null);
+        } else {
+            //All other options represent a date to select
+            GuiUtil.hideShowView(week_days_row, false, null, false, null);
+            GuiUtil.hideShowView(date_row, true, null, false, null);
+            GuiUtil.hideShowView(interval_row, false, null, false, null);
+        }
         checkAutodeleteRepetitive();
     }
 
 
-    private void setSoundType(final Context context) {
-        sound_type.setText(
-                context.getResources().getStringArray(R.array.sound_type)[alarm.getSoundType().getValue()+1]);
+    /**
+     * Refresh alarm date
+     */
+    private void setDate() {
+        date.setText(alarm.getDateText(getContext()));
     }
 
 
-    private void setSoundSource(final Context context) {
-        boolean isError = false;
-        String text = null;
-        switch (alarm.getSoundType() ) {
-            case DEFAULT:
-                text = alarm.getSoundSourceTitleDef();
-                break;
-            case NONE:
-                FnUtil.hideShowView(sound_source, false, null);
-                return;
-            case RINGTONE:
-            case NOTIFICATION:
-            case ALARM:
-                text = alarm.getSoundSourceTitle();
-                if (FnUtil.isVoid(text)) {
-                    text = context.getString(R.string.select_sound);
+    /**
+     * Refresh alarm time interval
+     */
+    private void setInterval() {
+        interval.setText(alarm.getIntervalText(getContext()));
+    }
+
+
+    /**
+     * Refresh alarm sound source
+     */
+    private void setSoundType() {
+        sound_type.setText(alarm.getSoundTypeText(getContext(), prefs));
+        if (!alarm.isDisabledSoundState(prefs) && alarm.getSoundTypeDef(prefs).isLocalFolderSound()) {
+            sound_type_random.setColorFilter((alarm.isDefaultSoundState())?
+                    ContextCompat.getColor(this.getActivity(), R.color.default_setting) :
+                    GuiUtil.getColorText(getContext())
+            );
+            sound_type_random.setVisibility(View.VISIBLE);
+        }
+        else sound_type_random.setVisibility(View.GONE);
+        setSettingColor(sound_type, alarm.isDefaultSoundState());
+    }
+
+
+    /**
+     * Refresh alarm sound source
+     */
+     private void setSoundSource() {
+         final Context context = getContext();
+         boolean isError = false;
+         String text = null;
+         if (!alarm.isDisabledSoundState(prefs))
+            switch (alarm.getSoundTypeDef(prefs)) {
+                case RINGTONE:
+                case NOTIFICATION:
+                case ALARM:
+                    text = alarm.getSoundSourceTitleDef(prefs);
+                    if (FnUtil.isVoid(text)) {
+                        text = context.getString(R.string.select_sound);
+                        isError = true;
+                    }
+                    break;
+                case LOCAL_FOLDER:
+                    text = alarm.getSoundSourceTitleDef(prefs);
+                    if (FnUtil.isVoid(text)) text = context.getString(R.string.select_folder);
+                    else {
+                        try {
+                            if (FnUtil.containsAudioFiles(alarm.getSoundSourceDef(prefs))) break;
+                        } catch(Exception e) {}
+                        text = context.getString(R.string.songs_not_found, text);
+                    }
                     isError = true;
-                }
-                break;
-            case LOCAL_FOLDER:
-                text = alarm.getSoundSourceTitle();
-                if (FnUtil.isVoid(text)) text = context.getString(R.string.select_folder);
-                else {
-                    try {
-                        if (FnUtil.containsAudioFiles(alarm.getSoundSource())) break;
-                    } catch(Exception e) {}
-                    text = context.getString(R.string.songs_not_found, text);
-                }
-                isError = true;
-                break;
-            case LOCAL_FILE:
-                text = alarm.getSoundSourceTitle();
-                if (FnUtil.isVoid(text)) text = context.getString(R.string.select_song);
-                else {
-                    try {
-                        if (new File(alarm.getSoundSource()).exists()) break;
-                    } catch(Exception e) {}
-                    text = context.getString(R.string.song_not_found, text);
-                }
-                isError = true;
-                break;
-        }
-        if (text == null) {
-            text = context.getString(R.string.select_sound);
-            isError = true;
-        }
-        sound_source.setText(text);
-        if (isError) sound_source.setTextColor(ContextCompat.getColor(context, R.color.error));
-        else sound_source.setTextColor(FnUtil.getTextColor(context));
-        FnUtil.hideShowView(sound_source, true, null);
+                    break;
+                case LOCAL_FILE:
+                    text = alarm.getSoundSourceTitleDef(prefs);
+                    if (FnUtil.isVoid(text)) text = context.getString(R.string.select_song);
+                    else {
+                        try {
+                            if (FnUtil.uriStringToFile(alarm.getSoundSourceDef(prefs)).exists()) break;
+                        } catch(Exception e) {}
+                        text = context.getString(R.string.song_not_found, text);
+                    }
+                    isError = true;
+                    break;
+            }
+         else {
+             GuiUtil.hideShowView(sound_source, false, null, false, null);
+             sound_type_row.setPadding(sound_type_row.getPaddingLeft(), sound_type_row.getPaddingTop(),
+                     sound_type_row.getPaddingRight(), sound_type_row.getPaddingTop());
+             return;
+         }
+         sound_type_row.setPadding(sound_type_row.getPaddingLeft(), sound_type_row.getPaddingTop(),
+                 sound_type_row.getPaddingRight(), 0);
+         if (text == null) {
+             text = context.getString(R.string.select_sound);
+             isError = true;
+         }
+         sound_source.setText(text);
+         if (isError) sound_source.setTextColor(ContextCompat.getColor(context, R.color.warningText));
+         else setSettingColor(sound_source, alarm.isDefaultSoundState());
+         GuiUtil.hideShowView(sound_source, true, null, false, null);
+     }
+
+
+    /**
+     * Refresh alarm volume and vibration
+     */
+    private void setVolume() {
+        final int vol = (alarm.getVolumeState().isEnabled())?
+                alarm.getVolume() : alarm.getVolumeState().getValue();
+        volume.setProgress(prefs.getVolumeTransformer().getVolume(vol));
+        refreshVolume();
+        refreshVibrate();
     }
 
 
-    private void setVolume(final Context context) {
-        volume.setProgress(prefs.getVolumeTransformer().getVolume(alarm.getVolume()));
-        refreshVolume(context);
-        refreshVibrate(context);
+    /**
+     * Refresh alarm gradual volume interval
+     */
+    private void setGradualInterval() {
+        gradual_interval.setText(alarm.getGradualIntervalText(getContext(), prefs));
+        setSettingColor(gradual_interval, alarm.isDefaultGradualIntervalState());
     }
 
 
-    private void setGradualInterval(final Context context) {
-        gradual_interval.setText(alarm.getGradualIntervalText(context));
+    /**
+     * Refresh alarm wake times and interval
+     */
+    private void setWakeTimesInterval() {
+        wake_times_interval.setText(alarm.getWakeTimesIntervalText(getContext(), prefs));
+        setSettingColor(wake_times_interval, alarm.isDefaultWakeTimesState());
     }
 
 
-    private void setWakeTimes(final Context context) {
-        wake_times.setText(alarm.getWakeTimesText(context));
-        FnUtil.hideShowView(wake_interval_block, !alarm.isDisabledWakeTimes(), null);
-    }
-
-
-    private void setWakeInterval(final Context context) {
-        wake_interval.setText(alarm.getWakeIntervalText(context));
-    }
-
-
+    /**
+     * Refresh alarm auto-delete check
+     * @param init Is refreshing from activity init?
+     */
     private void setDeleteAlarm(final boolean init) {
         final boolean isDel = alarm.isDelete();
-        if (init) autodelete_alarm.setTag(isDel);
-        autodelete_alarm.setChecked(isDel);
-        FnUtil.hideShowView(autodelete_alarm_block, isDel, null);
-        if (!init)
-            try {
-                final NestedScrollView nsc = (NestedScrollView) rootView.getParent();
-                if (isDel && !FnUtil.isTotallyVisibleView(nsc, autodelete_alarm_block))
-                    FnUtil.scrollToView(nsc, autodelete_alarm_block);
-            } catch(Exception ignore) {}
+        if (init) autodelete.setTag(isDel);
+        autodelete.setChecked(isDel);
+        if (init) GuiUtil.hideShowView(autodelete_content_row, isDel, null, false, null);
+        else GuiUtil.hideShowView(autodelete_content_row, isDel, null, true,
+                (NestedScrollView) rootView.getParent());
     }
 
 
+    /**
+     * Refresh alarm delete option, "delete when done" or "delete after date"
+     */
     private void setDeleteOption() {
         if (alarm.isDeleteDone()) {
-            autodelete_alarm_done.setTag(Boolean.TRUE);
-            autodelete_alarm_done.setChecked(true);
-            autodelete_alarm_after.setTag(Boolean.FALSE);
-            autodelete_alarm_after.setChecked(false);
+            autodelete_done.setTag(Boolean.TRUE);
+            autodelete_done.setChecked(true);
+            autodelete_after.setTag(Boolean.FALSE);
+            autodelete_after.setChecked(false);
         } else if (alarm.hasDeleteDate()) {
-            autodelete_alarm_done.setTag(Boolean.FALSE);
-            autodelete_alarm_done.setChecked(false);
-            autodelete_alarm_after.setTag(Boolean.TRUE);
-            autodelete_alarm_after.setChecked(true);
+            autodelete_done.setTag(Boolean.FALSE);
+            autodelete_done.setChecked(false);
+            autodelete_after.setTag(Boolean.TRUE);
+            autodelete_after.setChecked(true);
         }
         checkAutodeleteRepetitive();
     }
 
 
-    private void setDeleteDate(final Context context) {
-        autodelete_alarm_after_date.setText(alarm.getDeleteDateText(context));
+    /**
+     * Refresh alarm delete after date
+     */
+    private void setDeleteDate() {
+        autodelete_after_date.setText(alarm.getDeleteDateText(getContext()));
     }
 
 
+    /**
+     * Refresh alarm ignore on vacation check
+     * @param init Is refreshing from activity init?
+     */
     private void setIgnoreVacation(final boolean init) {
         final boolean isIgnore = alarm.isIgnoreVacation();
         if (init) ignore_vacation.setTag(isIgnore);
         ignore_vacation.setChecked(isIgnore);
     }
 
+
+    /**
+     * Refresh alarm next ring (header) message
+     */
+    private void updateNextRing() {
+//        alarm.calculateNextRingChanged(true);
+        final String text = getContext().getString(R.string.next_ring_message,
+                alarm.getNextRingText(getContext(), false));
+        if (actionbar_subtitle != null) actionbar_subtitle.setText(text);
+        if (next_ring != null) next_ring.setText(text);
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // TRANSITIONS
+
+
+    @SuppressWarnings("NewApi")
+    void prepareTransitionNames(final long itemId) {
+        TransitionUtil.prepareSharedTransitionName(actionbar_time_h, getString(R.string.transition_detail_hour), itemId);
+        TransitionUtil.prepareSharedTransitionName(actionbar_time_m, getString(R.string.transition_detail_minute), itemId);
+        TransitionUtil.prepareSharedTransitionName(actionbar_time_ampm, getString(R.string.transition_detail_ampm), itemId);
+        TransitionUtil.prepareSharedTransitionName(title, getString(R.string.transition_detail_title), itemId);
+        TransitionUtil.prepareSharedTransitionName(actionbar_onoff, getString(R.string.transition_detail_switch), itemId);
+        TransitionUtil.prepareSharedTransitionName(actionbar_subtitle, getString(R.string.transition_detail_next), itemId);
+        TransitionUtil.prepareSharedTransitionName(repetition_text, getString(R.string.transition_detail_repetition_text), itemId);
+        TransitionUtil.prepareSharedTransitionName(repetition_icon, getString(R.string.transition_detail_repetition_icon), itemId);
+        TransitionUtil.prepareSharedTransitionName(repetition, getString(R.string.transition_detail_repetition), itemId);
+        TransitionUtil.prepareSharedTransitionName(day1, getString(R.string.transition_detail_day1), itemId);
+        TransitionUtil.prepareSharedTransitionName(day2, getString(R.string.transition_detail_day2), itemId);
+        TransitionUtil.prepareSharedTransitionName(day3, getString(R.string.transition_detail_day3), itemId);
+        TransitionUtil.prepareSharedTransitionName(day4, getString(R.string.transition_detail_day4), itemId);
+        TransitionUtil.prepareSharedTransitionName(day5, getString(R.string.transition_detail_day5), itemId);
+        TransitionUtil.prepareSharedTransitionName(day6, getString(R.string.transition_detail_day6), itemId);
+        TransitionUtil.prepareSharedTransitionName(day7, getString(R.string.transition_detail_day7), itemId);
+        TransitionUtil.prepareSharedTransitionName(interval_text, getString(R.string.transition_detail_interval_text), itemId);
+        TransitionUtil.prepareSharedTransitionName(interval_icon, getString(R.string.transition_detail_interval_icon), itemId);
+        TransitionUtil.prepareSharedTransitionName(interval, getString(R.string.transition_detail_interval), itemId);
+        TransitionUtil.prepareSharedTransitionName(date_text, getString(R.string.transition_detail_date_text), itemId);
+        TransitionUtil.prepareSharedTransitionName(date_icon, getString(R.string.transition_detail_date_icon), itemId);
+        TransitionUtil.prepareSharedTransitionName(date, getString(R.string.transition_detail_date), itemId);
+    }
+
+
+    public Pair[] getSharedElements() {
+        final Pair[] data = new Pair[
+                (alarm.getRepetition().equals(Alarm.AlarmRepetition.WEEK_DAYS))? 17 : 13] ;
+        data[1] = TransitionUtil.buildSharedTransitionPair(actionbar_time_h);
+        data[2] = TransitionUtil.buildSharedTransitionPair(actionbar_time_m);
+        data[3] = TransitionUtil.buildSharedTransitionPair(actionbar_time_ampm);
+        data[4] = TransitionUtil.buildSharedTransitionPair(title);
+        data[5] = TransitionUtil.buildSharedTransitionPair(actionbar_onoff);
+        data[6] = TransitionUtil.buildSharedTransitionPair(actionbar_subtitle);
+        data[7] = TransitionUtil.buildSharedTransitionPair(repetition_text);
+        data[8] = TransitionUtil.buildSharedTransitionPair(repetition_icon);
+        data[9] = TransitionUtil.buildSharedTransitionPair(repetition);
+        if (alarm.getRepetition().equals(Alarm.AlarmRepetition.WEEK_DAYS)) {
+            data[10] = TransitionUtil.buildSharedTransitionPair(day1);
+            data[11] = TransitionUtil.buildSharedTransitionPair(day2);
+            data[12] = TransitionUtil.buildSharedTransitionPair(day3);
+            data[13] = TransitionUtil.buildSharedTransitionPair(day4);
+            data[14] = TransitionUtil.buildSharedTransitionPair(day5);
+            data[15] = TransitionUtil.buildSharedTransitionPair(day6);
+            data[16] = TransitionUtil.buildSharedTransitionPair(day7);
+        } else if (alarm.getRepetition().equals(Alarm.AlarmRepetition.INTERVAL)) {
+            data[10] = TransitionUtil.buildSharedTransitionPair(interval_text);
+            data[11] = TransitionUtil.buildSharedTransitionPair(interval_icon);
+            data[12] = TransitionUtil.buildSharedTransitionPair(interval);
+        } else {
+            data[10] = TransitionUtil.buildSharedTransitionPair(date_text);
+            data[11] = TransitionUtil.buildSharedTransitionPair(date_icon);
+            data[12] = TransitionUtil.buildSharedTransitionPair(date);
+        }
+        return data;
+    }
 
 }

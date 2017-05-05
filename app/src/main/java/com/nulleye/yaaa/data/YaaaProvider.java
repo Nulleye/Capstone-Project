@@ -11,22 +11,27 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.nulleye.yaaa.data.YaaaContract.AlarmEntry;
 import com.nulleye.yaaa.util.FnUtil;
-import com.nulleye.yaaa.util.SentenceBuilder;
+import com.nulleye.yaaa.util.helpers.SqlExpressionBuilderHelper;
 
 
 /**
- * Yaaa content provider
+ * YaaaProvider
+ * Yaaa content provider implementation
  *
- * Created by Cristian Alvarez on 26/4/16.
+ * @author Cristian Alvarez Planas
+ * @version 3
+ * 26/4/16
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class YaaaProvider extends ContentProvider {
 
-    static String TAG = YaaaProvider.class.getSimpleName();
+    public static String TAG = YaaaProvider.class.getSimpleName();
 
     //Types of URIs
     static final int ALARM = 100;
@@ -53,8 +58,8 @@ public class YaaaProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        SentenceBuilder where = new SentenceBuilder();
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        SqlExpressionBuilderHelper where = new SqlExpressionBuilderHelper();
         final int match = uriMatcher.match(uri);
         switch (match) {
             case ALARMS:
@@ -62,7 +67,7 @@ public class YaaaProvider extends ContentProvider {
             case ALARM:
                 final Long id = AlarmEntry.getAlarmIdFromUri(uri);
                 if (id != null) {
-                    where.addExpr(AlarmEntry._ID, SentenceBuilder.EQ, id);
+                    where.addExpr(AlarmEntry._ID, SqlExpressionBuilderHelper.EQ, id);
                     break;
                 }
             default:
@@ -80,7 +85,7 @@ public class YaaaProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         switch (uriMatcher.match(uri)) {
             case ALARM:
                 return AlarmEntry.CONTENT_ITEM_TYPE;
@@ -94,11 +99,11 @@ public class YaaaProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         if (uriMatcher.match(uri) == ALARMS)
             try {
                 final Uri returnUri = insert(dbHelper.getWritableDatabase(), values);
-                notifyChange(uri, null);
+                notifyChange(returnUri, null);
                 return returnUri;
             } catch (Exception e) {
                 throw new android.database.SQLException("Failed to insert row into: " + uri);
@@ -108,7 +113,7 @@ public class YaaaProvider extends ContentProvider {
 
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final int count;
         switch (uriMatcher.match(uri)) {
@@ -119,8 +124,8 @@ public class YaaaProvider extends ContentProvider {
             case ALARM:
                 final Long id = AlarmEntry.getAlarmIdFromUri(uri);
                 if (id != null) {
-                    SentenceBuilder select = new SentenceBuilder(AlarmEntry._ID, SentenceBuilder.EQ, id);
-                    if (!FnUtil.isVoid(selection)) select.add(SentenceBuilder.AND).addLP().add(selection).addRP();
+                    SqlExpressionBuilderHelper select = new SqlExpressionBuilderHelper(AlarmEntry._ID, SqlExpressionBuilderHelper.EQ, id);
+                    if (!FnUtil.isVoid(selection)) select.add(SqlExpressionBuilderHelper.AND).addLP().add(selection).addRP();
                     count = db.delete(AlarmEntry.TABLE_NAME, select.build(), selectionArgs);
                     notifyChange(uri, null);
                     break;
@@ -133,23 +138,33 @@ public class YaaaProvider extends ContentProvider {
 
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        if (uriMatcher.match(uri) == ALARM) {
-            final SQLiteDatabase db = dbHelper.getWritableDatabase();
-            final Long id = AlarmEntry.getAlarmIdFromUri(uri);
-            if (id != null) {
-                final int count = db.update(AlarmEntry.TABLE_NAME, values,
-                        new SentenceBuilder(AlarmEntry._ID, SentenceBuilder.EQ, id).build(), null);
-                notifyChange(uri, null);
-                return count;
-            }
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        switch (uriMatcher.match(uri)) {
+            case ALARMS:
+                final Context ctxt = getContext();
+                if (ctxt != null) {
+                    final ContentResolver cr = ctxt.getContentResolver();
+                    if (cr != null) cr.notifyChange(uri, null);
+                    return -1;
+                }
+                break;
+            case ALARM:
+                final SQLiteDatabase db = dbHelper.getWritableDatabase();
+                final Long id = AlarmEntry.getAlarmIdFromUri(uri);
+                if (id != null) {
+                    final int count = db.update(AlarmEntry.TABLE_NAME, values,
+                            new SqlExpressionBuilderHelper(AlarmEntry._ID, SqlExpressionBuilderHelper.EQ, id).build(), null);
+                    notifyChange(uri, null);
+                    return count;
+                }
+                break;
         }
         throw new UnsupportedOperationException("Cannot update uri: " + uri);
     }
 
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         if (uriMatcher.match(uri) == ALARMS) {
             int returnCount = 0;
@@ -210,6 +225,11 @@ public class YaaaProvider extends ContentProvider {
 //    }
 
 
+    /**
+     * Notify listeners of a data change
+     * @param uri Uri to notify
+     * @param cursor Related cursor (if any)
+     */
     private void notifyChange(final Uri uri, final Cursor cursor) {
         final Context ctxt = getContext();
         if (ctxt != null) {

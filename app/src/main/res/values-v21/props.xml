@@ -1,0 +1,5 @@
+<resources>
+
+    <bool name="special_animations">true</bool>
+
+</resources>

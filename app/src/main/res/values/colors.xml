@@ -3,24 +3,29 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff4081</color>
-    <color name="colorAccentLight">#FF8090</color>
-    <color name="colorAccentDark">#FF2061</color>
+    <color name="colorAccentLight">#ff669a</color>
+    <color name="colorAccentDark">#ff2061</color>
+    <color name="colorAccentLighter">#FFCCEE</color>
 
     <color name="black_overlay">#66000000</color>
 
     <color name="colorButtonNormal">#ffffff</color>
 
     <color name="delete_swipe_background">#FF3333</color>
-    <color name="error">#FF3333</color>
-    <color name="detail_text_color">#000000</color>
+    <color name="warningText">#FF3333</color>
+    <color name="normalText">#000000</color>
+    <color name="disabledText">@color/colorButtonDisabledDark</color>
+    <color name="whiteText">#ffffff</color>
 
     <color name="colorButtonDisabled">#e6e6e6</color>
     <color name="colorButtonDisabledDark">#a6a6a6</color>
 
-    <color name="list_sch_no">#e2e2e2</color>
+    <color name="list_sch_no">#ecebeb</color>
     <color name="list_sch_yes">#ffffff</color>
-    <color name="list_sch_yes_vacation">#ffe2bd</color>
+    <color name="list_sch_yes_vacation">#fcecd7</color>
+    <color name="expanded_item_background">#ffffff</color>
 
+    <color name="btn_expand">#000000</color>
 
     <color name="btn_snooze">#ff904a</color>
     <color name="btn_snooze_dark">#fc7017</color>
@@ -28,9 +33,15 @@
     <color name="btn_stop">#ff534a</color>
     <color name="btn_stop_dark">#ff2116</color>
 
-    <color name="volume_default">@color/colorPrimary</color>
-    <color name="volume_disabled">@color/colorButtonDisabledDark</color>
+    <color name="default_setting">@color/colorButtonDisabledDark</color>
+    <color name="volume_disabled">@color/colorPrimary</color>
 
     <color name="tertiary_text_dark">#808080</color>
+
+    <color name="color_disabled_picker">#808080</color>
+
+    <color name="windowBackground">#ffffff</color>
+
+    <color name="scrim">#99323232</color>
 
 </resources>

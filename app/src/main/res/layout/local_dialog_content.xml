@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout android:orientation="horizontal"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
+        <TextView
+            android:text="@string/path"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/md_dialog_frame_margin"
+            android:paddingLeft="@dimen/md_dialog_frame_margin"
+            android:layout_marginEnd="@dimen/line_sep2"
+            android:layout_marginRight="@dimen/line_sep2"
+            android:paddingTop="@dimen/md_content_padding_top"
+            android:paddingBottom="@dimen/md_content_padding_top"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:id="@+id/current_path"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/md_dialog_frame_margin"
+            android:paddingRight="@dimen/md_dialog_frame_margin"
+            android:paddingTop="@dimen/md_content_padding_top"
+            android:paddingBottom="@dimen/md_content_padding_top"
+            android:maxLines="1"
+            android:ellipsize="start"
+            />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/folder_contents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbarStyle="outsideOverlay"
+            android:scrollbars="vertical"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/md_content_padding_top"
+            android:paddingBottom="@dimen/md_content_padding_bottom"
+            />
+
+    </FrameLayout>
+
+</LinearLayout>

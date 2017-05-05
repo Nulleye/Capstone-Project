@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="@dimen/md_dialog_frame_margin"
+    >
+
+    <LinearLayout android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
+
+        <CheckBox
+            android:text="@string/default_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/default_check"
+            android:layout_marginEnd="@dimen/md_dialog_frame_margin"
+            android:layout_marginLeft="@dimen/md_dialog_frame_margin"
+            android:layout_marginRight="@dimen/md_dialog_frame_margin"
+            android:layout_marginStart="@dimen/md_dialog_frame_margin"
+            android:layout_marginBottom="@dimen/line_sep"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
+
+        <CheckBox
+            android:text="@string/disabled_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/disabled_check"
+            android:layout_marginEnd="@dimen/md_dialog_frame_margin"
+            android:layout_marginLeft="@dimen/md_dialog_frame_margin"
+            android:layout_marginRight="@dimen/md_dialog_frame_margin"
+            android:layout_marginStart="@dimen/md_dialog_frame_margin"
+            android:layout_marginBottom="@dimen/line_sep"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/title_row"
+                  android:orientation="horizontal"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center"
+                  android:layout_weight="1">
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/content_row"
+                  android:orientation="horizontal"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center"
+                  android:layout_weight="1">
+    </LinearLayout>
+
+</LinearLayout>

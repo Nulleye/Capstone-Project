@@ -9,4 +9,10 @@
         <attr name="metaButtonBarButtonStyle" format="reference"/>
     </declare-styleable>
 
+
+    <declare-styleable name="Elevator">
+        <attr name="initialElevation" format="dimension" />
+        <attr name="finalElevation" format="dimension" />
+    </declare-styleable>
+
 </resources>

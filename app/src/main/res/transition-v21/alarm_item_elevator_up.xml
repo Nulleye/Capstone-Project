@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <transition xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+        class="com.nulleye.common.transitions.Elevator"
+        android:duration="@integer/pop_animation_duration"
+        android:interpolator="@android:interpolator/linear_out_slow_in"
+        app:initialElevation="0dp"
+        app:finalElevation="@dimen/pop_item_elevation"
+        />
+

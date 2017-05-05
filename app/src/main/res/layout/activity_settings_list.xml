@@ -6,37 +6,48 @@
              android:padding="@dimen/form_pad"
     >
 
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/vacation_period"
-        android:textAppearance="?android:attr/textAppearance"
-        android:id="@+id/vacation_period"
-        android:layout_marginBottom="@dimen/line_sep"
-        android:contentDescription="@string/cd_vacation_period"
-        android:focusable="true"
-        />
-
     <TableRow
+        android:id="@+id/vacation_period_row"
+        android:layout_gravity="start|center_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/line_sep2"
-        android:layout_gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        >
+        <CheckBox
+            android:id="@+id/vacation_period"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/vacation_period"
+            android:textAppearance="?android:attr/textAppearance"
+            android:layout_span="2"
+            android:layout_weight="1"
+            android:contentDescription="@string/cd_vacation_period"
+            android:focusable="true"
+            />
+    </TableRow>
+
+    <TableRow
+        android:id="@+id/vacation_period_date_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/line_sep"
+        android:paddingBottom="@dimen/line_sep"
+        android:background="?attr/selectableItemBackground"
         >
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginRight="@dimen/field_sep"
-            android:layout_marginEnd="@dimen/field_sep"
             android:layout_gravity="end|center_vertical"
             android:layout_column="0"
             >
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:gravity="end|center_vertical"
+                android:textAlignment="textEnd"
                 android:text="@string/date"
-                android:layout_gravity="center_vertical"
                 android:layout_marginRight="@dimen/field_sep2"
                 android:layout_marginEnd="@dimen/field_sep2"
                 />
@@ -48,39 +59,32 @@
                 android:contentDescription="@string/cd_vacation_period_end_date"
                 />
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/vacation_period_date"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_column="1"
+            android:layout_gravity="start|center_vertical"
             android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            >
-            <TextView
-                android:layout_weight="1"
-                android:id="@+id/vacation_period_date"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimary"
-                android:layout_gravity="start|center_vertical"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cd_choose_final_date_of_vacation"
-                android:focusable="true"
-                />
-        </LinearLayout>
+            android:layout_marginLeft="@dimen/field_sep"
+            android:layout_marginStart="@dimen/field_sep"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary"
+            android:contentDescription="@string/cd_choose_final_date_of_vacation"
+            android:focusable="true"
+            android:layout_column="1"
+            />
     </TableRow>
+
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/line_2sep"
+        android:paddingBottom="@dimen/line_sep"
         >
         <TextView
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearance"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/tertiary_text_dark"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="@dimen/field_sep"
@@ -90,70 +94,63 @@
     </TableRow>
 
     <TableRow
+        android:id="@+id/notification_interval_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/line_sep2"
-        android:layout_gravity="center_vertical"
+        android:paddingTop="@dimen/line_sep"
+        android:background="?attr/selectableItemBackground"
         >
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginRight="@dimen/field_sep"
-            android:layout_marginEnd="@dimen/field_sep"
-            android:layout_gravity="end|center_vertical"
+            android:layout_gravity="end|top"
             android:layout_column="0"
             >
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
+                android:gravity="end|top"
+                android:textAlignment="textEnd"
                 android:text="@string/notification_interval"
-                android:layout_gravity="center_vertical"
                 android:layout_marginRight="@dimen/field_sep2"
                 android:layout_marginEnd="@dimen/field_sep2"
                 />
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 app:srcCompat="@drawable/ic_restore"
                 android:tint="@color/tertiary_text_dark"
                 android:contentDescription="@string/cd_notification_interval"
                 />
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/notification_interval"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:orientation="horizontal"
-            android:layout_column="1"
+            android:layout_gravity="start|top"
             android:layout_weight="1"
-            >
-            <TextView
-                android:layout_weight="1"
-                android:id="@+id/notification_interval"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimary"
-                android:layout_gravity="start|center_vertical"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cd_click_to_select_notification_interval"
-                android:focusable="true"
-                />
-        </LinearLayout>
+            android:layout_marginLeft="@dimen/field_sep"
+            android:layout_marginStart="@dimen/field_sep"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary"
+            android:contentDescription="@string/cd_click_to_select_notification_interval"
+            android:focusable="true"
+            android:layout_column="1"
+            />
     </TableRow>
+
     <TableRow
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/line_2sep"
+        android:paddingBottom="@dimen/line_sep"
         >
         <TextView
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearance"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/tertiary_text_dark"
             android:layout_gravity="start|center_vertical"
             android:layout_marginStart="@dimen/field_sep"
@@ -163,73 +160,66 @@
     </TableRow>
 
     <TableRow
+        android:id="@+id/snooze_interval_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/line_2sep"
-        android:layout_gravity="center_vertical"
+        android:paddingTop="@dimen/line_sep"
+        android:layout_marginBottom="@dimen/line_sep"
+        android:background="?attr/selectableItemBackground"
         >
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginRight="@dimen/field_sep"
-            android:layout_marginEnd="@dimen/field_sep"
-            android:layout_gravity="end|center_vertical"
+            android:layout_gravity="end|top"
             android:layout_column="0"
             >
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end|top"
+                android:gravity="end|top"
+                android:textAlignment="textEnd"
                 android:text="@string/snooze_interval"
-                android:layout_gravity="center_vertical"
                 android:layout_marginRight="@dimen/field_sep2"
                 android:layout_marginEnd="@dimen/field_sep2"
                 />
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 app:srcCompat="@drawable/ic_snooze"
                 android:tint="@color/tertiary_text_dark"
                 android:contentDescription="@string/cd_snooze_interval"
                 />
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/snooze_interval"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_column="1"
+            android:layout_gravity="start|top"
             android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            >
-            <TextView
-                android:layout_weight="1"
-                android:id="@+id/snooze_interval"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?android:attr/textColorPrimary"
-                android:layout_gravity="start|center_vertical"
-                android:gravity="center_vertical"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/cd_click_to_select_snooze_interval"
-                android:focusable="true"
-                />
-        </LinearLayout>
+            android:layout_marginLeft="@dimen/field_sep"
+            android:layout_marginStart="@dimen/field_sep"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?android:attr/textColorPrimary"
+            android:contentDescription="@string/cd_click_to_select_snooze_interval"
+            android:focusable="true"
+            android:layout_column="1"
+            />
     </TableRow>
 
     <TextView
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="@android:style/TextAppearance.Large"
         android:layout_gravity="start|center_vertical"
         android:text="@string/alarm_defaults"
-        android:layout_marginBottom="@dimen/line_2sep"
+        android:layout_marginBottom="@dimen/line_sep"
+        android:layout_marginTop="@dimen/line_sep"
         />
 
-    <include layout="@layout/alarm_options"/>
+    <include layout="@layout/alarm_common_options"/>
 
 
 </TableLayout>

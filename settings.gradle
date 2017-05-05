@@ -1,1 +1,2 @@
-include ':app', ':library'
+include ':app', ':discrete-seekbar-library', ':datetime-picker-library'
+project(':datetime-picker-library').projectDir = new File('material-datetime-picker-library/library')

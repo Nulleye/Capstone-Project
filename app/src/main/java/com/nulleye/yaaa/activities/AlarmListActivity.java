@@ -1,124 +1,192 @@
 package com.nulleye.yaaa.activities;
 
-import android.app.TimePickerDialog;
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Canvas;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.FrameLayout;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.TimePicker;
 
-import com.afollestad.materialdialogs.folderselector.FileChooserDialog;
-import com.afollestad.materialdialogs.folderselector.FolderChooserDialog;
+import com.nulleye.common.MapList;
+import com.nulleye.common.transitions.EnhancedSharedElementCallback;
+import com.nulleye.common.widget.recyclerview.AdvancedItemAnimator;
+import com.nulleye.common.widget.recyclerview.AdvancedRecyclerView;
 import com.nulleye.yaaa.R;
 import com.nulleye.yaaa.YaaaApplication;
 import com.nulleye.yaaa.data.Alarm;
 import com.nulleye.yaaa.data.AlarmDbHelper;
+import com.nulleye.yaaa.data.YaaaPreferences;
+import com.nulleye.yaaa.dialogs.SettingsMaster;
 import com.nulleye.yaaa.util.FnUtil;
-import com.nulleye.yaaa.util.external.DividerItemDecoration;
+import com.nulleye.yaaa.util.gui.GuiUtil;
+import com.nulleye.yaaa.util.helpers.AlarmViewHolder;
 
-import java.io.File;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
+ * AlarmListActivity
  * Alarm list, main app activity
+ * TODO Two pane mode for wide devices (tablets) or single item list activity for narrow devices (phones)
  *
- * Two pane mode for wide devices (tablets) or
- * single item list activity for narrow devices (phones)
- *
- * Created by Cristian Alvarez on 3/5/16.
+ * @author Cristian Alvarez Planas
+ * @version 3
+ * 3/5/16.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class AlarmListActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor>,
-        FolderChooserDialog.FolderCallback, FileChooserDialog.FileCallback {
+        LoaderManager.LoaderCallbacks<Cursor>, SettingsMaster.SettingsMasterListener,
+        AdvancedRecyclerView.ScrollToPositionListener {
+
+    //Alarm adapter requests
+    public static int REQUEST_REPOSITION = -2;
+    public static int REQUEST_RETURN = -1;
+    public static int REQUEST_NONE = 0;
+    public static int REQUEST_EDIT = 1;
+
+    public static String ACTION_NEW = "com.nulleye.yaaa.ALARM_ACTION_NEW";
+
+    public static String TAG = AlarmListActivity.class.getName();
+    protected boolean DEBUG = true;
+
+    YaaaPreferences prefs = YaaaApplication.getPreferences();
 
     private static final int LOADER_ID = 1;
 
-    private static String VIEW_ALARM_ID = "view.alarm.id";
-
     private boolean twoPane;    //Current mode: true -> wide (tablets), false -> narrow (phones)
 
-    private RecyclerView recyclerView;
-    private AlarmRecyclerViewAdapter recyclerViewAdapter;
+    private AlarmAdapter alarmAdapter;
 
-    private View emptyList;
+    @BindView(R.id.main_coordinator) CoordinatorLayout main_coordinator;
+    @BindView(R.id.alarm_list) AdvancedRecyclerView recyclerView;
+    @BindView(R.id.empty_list) View emptyList;
 
     //Show swipe to delete message
     private boolean showSwipeDelete;
 
-    private int viewAlarmId;
+    //Alarm id when reentering
+    private long reenter_alarm_id = Alarm.NO_ID;
+
+    //Current action to prevent reenter on notification double-click
+    private Integer current_action = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_alarm_list);
+        if (DEBUG) Log.d(TAG, "onCreate()");
 
-        showSwipeDelete = YaaaApplication.getPreferences().getShowSwipeDelete();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_alarm_list);
+        ButterKnife.bind(this);
+
+        //Tablet mode?
+        twoPane = (findViewById(R.id.alarm_detail_container) != null);
+
+        //TODO subtitle
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setSubtitle("dsfsdfsdf");
             toolbar.setTitle(getTitle());
             setSupportActionBar(toolbar);
         }
 
-
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        if (fab != null)
+        if (fab != null) {
             fab.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
-                    startActivity(new Intent(AlarmListActivity.this, AlarmDetailActivity.class));
-                    overridePendingTransition(R.anim.detail_in, R.anim.list_out);
-                    }
+                    createAction();
+                }
 
             });
+            //Set alarm list bottom padding (fab button size + margin)
+            fab.measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            recyclerView.setPadding(recyclerView.getPaddingLeft(), recyclerView.getPaddingTop(), recyclerView.getPaddingRight(),
+                    (int) (fab.getMeasuredHeight() + getResources().getDimension(R.dimen.fab_margin)));
+        }
 
-        emptyList = findViewById(R.id.empty_list);
+        //Setup adapter and recyclerView
+        alarmAdapter = new AlarmAdapter(recyclerView);
+        alarmAdapter.restoreState(savedInstanceState);
+        if (savedInstanceState == null) {
+            final Intent intent = getIntent();
+            final long alarmId = Alarm.getAlarmId(intent);
+            if (Alarm.isValidId(alarmId)) {
+                current_action = REQUEST_EDIT;
+                if (DEBUG) Log.d(TAG, "onCreate() - Edit " + alarmId);
+                alarmAdapter.setItemAction(current_action);
+                alarmAdapter.setItemId(alarmId);
+            } else if (ACTION_NEW.equals(intent.getAction()))
+                main_coordinator.post(new Runnable() {
 
-        twoPane = (findViewById(R.id.alarm_detail_container) != null);
+                    @Override
+                    public void run() {
+                        createAction();
+                    }
 
-        recyclerView = (RecyclerView) findViewById(R.id.alarm_list);
-        assert recyclerView != null;
-        setUpRecyclerView();
+                });
+        }
+        recyclerView.setAdapter(alarmAdapter);
+        recyclerView.setExpandAnimationDurationRes(R.integer.expand_animation_duration)
+                .setChangeAnimationDurationRes(R.integer.change_animation_duration)
+                .setSwipeDirections(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, 0)
+                .setDeleteBackground(R.color.delete_swipe_background)
+                .setDeleteIcon(R.drawable.delete_swipe_icon)
+                .setDeleteIconMarginRes(R.dimen.delete_swipe_icon_margin)
+                .setSwipeController(alarmAdapter)
+                .setOnFoldingListener(alarmAdapter)
+                .setScrollToPositionListener(this);
 
-        if (savedInstanceState != null)
-            viewAlarmId = savedInstanceState.getInt(VIEW_ALARM_ID, Alarm.NO_ID);
+        alarmAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
 
-        //Started from notification?
-        if (!Alarm.isValidId(viewAlarmId)) viewAlarmId = Alarm.getAlarmId(getIntent());
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if (reenter_alarm_id != Alarm.NO_ID) {
+                    Log.d(TAG, "onChanged() - Reenter " + reenter_alarm_id);
+                    final Alarm alarm = alarmAdapter.getItem(reenter_alarm_id);
+                    if (alarm != null) {
+                        final int pos = alarmAdapter.getItemPosition(reenter_alarm_id);
+                        Log.d(TAG, "onChanged() - Reenter " + reenter_alarm_id + " position " + pos);
+                        recyclerView.scrollToPos(REQUEST_RETURN, pos);
+                    } else continueAnimation();
+                    reenter_alarm_id = Alarm.NO_ID;
+                }
+            }
+
+        });
 
         //Load alarms
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         //Message swipe to delete (limit once per app execution using messageShown)
+        showSwipeDelete = prefs.getShowSwipeDelete();
         if (showSwipeDelete && !YaaaApplication.messageShown(R.string.swipe_to_delete)) {
             YaaaApplication.incMessageCount(R.string.swipe_to_delete);
             Snackbar.make(recyclerView, R.string.swipe_to_delete, Snackbar.LENGTH_LONG)
@@ -127,12 +195,34 @@ public class AlarmListActivity extends AppCompatActivity implements
                         @Override
                         public void onClick(View v) {
                             showSwipeDelete = false;
-                            YaaaApplication.getPreferences().setShowSwipeDelete(showSwipeDelete);
+                            prefs.setShowSwipeDelete(showSwipeDelete);
                         }
 
                     }).show();
         }
 
+        if (GuiUtil.enableSpecialAnimations(this)) prepareTransitions();
+
+    }
+
+//android.intent.action.SET_ALARM
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if (DEBUG) Log.d(TAG, "onNewIntent()");
+        if (current_action != null) {
+            if (DEBUG) Log.d(TAG, "onNewIntent() - Skipped " + current_action);
+            return;
+        }
+        final long alarmId = Alarm.getAlarmId(intent);
+        if (Alarm.isValidId(alarmId)) {
+            final int pos = alarmAdapter.getItemPosition(alarmId);
+            if (DEBUG) Log.d(TAG, "onNewIntent() - Edit " + alarmId + " position " + pos);
+            if (pos != RecyclerView.NO_POSITION) {
+                current_action = REQUEST_EDIT;
+                recyclerView.scrollToPos(current_action, pos);
+            }
+        } else if (ACTION_NEW.equals(intent.getAction())) createAction();
     }
 
 
@@ -140,10 +230,8 @@ public class AlarmListActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            intent.putExtra(SettingsActivity.GO_UP, AlarmListActivity.class.getCanonicalName());
-            startActivity(intent);
-            overridePendingTransition(R.anim.detail_in, R.anim.list_out);
+            final View view = findViewById(R.id.action_settings);
+            SettingsMaster.gotoSettings(this, view, null);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -157,44 +245,38 @@ public class AlarmListActivity extends AppCompatActivity implements
         return true;
     }
 
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        //Store first currently visible item
-        final int pos = ((LinearLayoutManager)recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
-        if (pos != RecyclerView.NO_POSITION) {
-            viewAlarmId = (int) recyclerViewAdapter.getItemId(pos);
-            if (Alarm.isValidId(viewAlarmId)) outState.putInt(VIEW_ALARM_ID, viewAlarmId);
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        recyclerViewAdapter.notifyDataSetChanged();
-    }
-
-
-    // VERY VERY WEIRD STUFF HERE!!
-    // FileChooserDialogEx & FolderChooserDialog implementations need an AppCompatActivity that
-    // implements a FolderChooserDialog.FolderCallback & FileChooserDialogEx.FileCallback!!!!
-    // This forces to do very very weird things, at least two different parameters one for
-    // the app and the other for the callback would have been a better approach
-    // TODO Make my own implementation of these dialogs
-
-    @Override
-    public void onFileSelection(@NonNull FileChooserDialog dialog, @NonNull File file) {
-        //TODO Tablet - if (fragment != null) fragment.onFileSelection(dialog, file);
+        alarmAdapter.storeState(outState);
     }
 
 
     @Override
-    public void onFolderSelection(@NonNull FolderChooserDialog dialog, @NonNull File folder) {
-        //TODO Tablet - if (fragment != null) fragment.onFolderSelection(dialog, folder);
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+
+    @SuppressLint("NewApi")
+    @Override
+    public void onActivityReenter(int resultCode, Intent data) {
+        super.onActivityReenter(resultCode, data);
+        Log.d(TAG,"onActivityReenter()");
+        final Alarm alarm = Alarm.getAlarm(data);
+        if (alarm == null) return;
+        if (GuiUtil.enableSpecialAnimations(this)) postponeEnterTransition();
+        reenter_alarm_id = alarm.getId();
+        final Alarm currentAlarm = alarmAdapter.getItem(reenter_alarm_id);
+        if ((currentAlarm != null) && (alarm.hashCode() == currentAlarm.hashCode()))
+            recyclerView.scrollToPos(REQUEST_RETURN, alarmAdapter.getItemPosition(reenter_alarm_id));
+        //else dataset update still pending
     }
 
 
     private void setSubtitle(final String text) {
+//TODO enable to update next alarm info on title
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        if (toolbar != null) {
 //            toolbar.setTitle(getTitle());
@@ -206,64 +288,112 @@ public class AlarmListActivity extends AppCompatActivity implements
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // ADAPTER WITH SWIPE TO DELETE AND UNDO FEATURE
 
-
-    public class AlarmRecyclerViewAdapter
-            extends RecyclerView.Adapter<AlarmRecyclerViewAdapter.ViewHolder> {
-
-        private List<Alarm> alarms;
-        private Set<Integer> delayedDeleteAlarms;
-
-
-        public AlarmRecyclerViewAdapter() {
-            setHasStableIds(true);
+    /**
+     * Callback function to receive setting dialog results
+     * @param type Type of setting
+     * @param result Dialog setting result, CHANGED or UNCHANGED
+     * @param alarmOrPrefs Object currently affected (Alarm or Preference object)
+     */
+    @Override
+    public void onSettingResult(final SettingsMaster.SettingType type,
+            final SettingsMaster.SettingResult result, @Nullable final Object alarmOrPrefs) {
+        //Ignore dialog "Cancel" events by now
+        if (SettingsMaster.SettingResult.UNCHANGED.equals(result)) return;
+        switch (type) {
+            case ALARM_TIME:
+                alarmAdapter.setItemAction(REQUEST_REPOSITION);
+                alarmAdapter.setItemId(((Alarm) alarmOrPrefs).getId());
+            case ALARM_REPETITION:
+            case ALARM_DATE:
+            case ALARM_INTERVAL:
+                //Save alarm -> will fire alarm list update
+                AlarmDbHelper.saveAlarm(this, prefs, (Alarm) alarmOrPrefs);
+                break;
         }
+    }
 
 
-        //Update data and restore pending runnables
-        public void swapCursor(final Cursor cAlarms) {
-            alarms = Alarm.getAlarms(cAlarms);
+    /**
+     * Create a new alarm
+     */
+    void createAction() {
+        current_action = null;
+        //TODO special new animation
+        startActivity(new Intent(AlarmListActivity.this, AlarmDetailActivity.class));
+        if (!GuiUtil.enableSpecialAnimations(this)) overridePendingTransition(R.anim.detail_in, R.anim.list_out);
 
-            if (!FnUtil.isVoid(alarms)) {
-                setSubtitle(Alarm.getNextScheduledAlarmText(AlarmListActivity.this, alarms, Calendar.getInstance()));
-                //cAlarms.close();
-            } else setSubtitle(null);
+    }
 
-            delayedDeleteAlarms = AlarmDbHelper.getDelayedDeleteAlarms();
 
-            //Scroll to show alarm when started from notification
-            if (Alarm.isValidId(viewAlarmId)) {
-                final int pos = Alarm.getAlarmPosition(alarms, viewAlarmId);
-                if (pos != RecyclerView.NO_POSITION) recyclerView.getLayoutManager().scrollToPosition(pos);
-                viewAlarmId = Alarm.NO_ID;
+    /**
+     * Edit alarm from holder
+     * @param holder
+     */
+    void editAction(final AlarmAdapter.AlarmHolder holder) {
+        current_action = null;
+        if (twoPane) {
+            final AlarmDetailFragment fragment = new AlarmDetailFragment();
+            fragment.setArguments(holder.getAlarm().putAlarm(new Bundle()));
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.alarm_detail_container, fragment)
+                    .commit();
+        } else {
+            final Intent intent = new Intent(AlarmListActivity.this, AlarmDetailActivity.class);
+            holder.getAlarm().putAlarm(intent);
+            if (GuiUtil.enableSpecialAnimations(AlarmListActivity.this)) {
+                recyclerView.enableItemAnimator(false);
+                final Pair<View, String>[] pairs = holder.getSharedTransitionData();
+                recyclerView.startDetailActivity(AlarmListActivity.this, intent, REQUEST_EDIT,
+                        (pairs != null)? ActivityOptionsCompat.makeSceneTransitionAnimation(AlarmListActivity.this,
+                                pairs).toBundle() : null, holder.itemView, holder.getExitTransitions());
+            } else {
+                startActivityForResult(intent, REQUEST_EDIT);
+                overridePendingTransition(R.anim.detail_in, R.anim.list_out);
             }
+        }
+    }
 
-            notifyDataSetChanged();
+
+    @Override
+    public void onScrollToPosition(@Nullable final Integer action, final RecyclerView.ViewHolder holder) {
+        if (action != null) {
+            if (action == REQUEST_EDIT) editAction((AlarmAdapter.AlarmHolder) holder);
+            else if (action == REQUEST_RETURN) continueAnimation();
+        }
+    }
+
+
+    @SuppressLint("NewApi")
+    protected void continueAnimation() {
+        if (GuiUtil.enableSpecialAnimations(this)) {
+            if (DEBUG) Log.d(TAG, "continueAnimation()");
+            startPostponedEnterTransition();
+            recyclerView.enableItemAnimator(true);
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // ADAPTER WITH "SWIPE TO DELETE AND UNDO FEATURE" AND "ITEM FOLDING"
+
+
+    //AlarmAdapter
+    public class AlarmAdapter
+            extends AdvancedRecyclerView.AdvancedAdapter<AlarmAdapter.AlarmHolder>
+            implements AdvancedItemAnimator.OnFoldingListener, AdvancedRecyclerView.SwipeController {
+
+        private MapList<Long, Alarm> alarms = null;
+
+
+        public AlarmAdapter(final AdvancedRecyclerView recyclerView) {
+            super(recyclerView);
         }
 
 
         @Override
         public long getItemId(int position) {
-            if (!FnUtil.isVoid(alarms) && (position > -1) && (position < alarms.size()))
-                return alarms.get(position).getId();
-            else return Alarm.NO_ID;
-        }
-
-
-        @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.alarm_list_content, parent, false);
-            return new ViewHolder(view);
-        }
-
-
-        @Override
-        public void onBindViewHolder(final ViewHolder holder, int position) {
-            final Alarm alarm = alarms.get(position);
-            holder.setAlarm(alarm, delayedDeleteAlarms.contains(alarm.getId()));
+            return alarms.getAtPosition(position).getId();
         }
 
 
@@ -273,170 +403,118 @@ public class AlarmListActivity extends AppCompatActivity implements
         }
 
 
-        public boolean isDelayedDeleteAlarm(final int position) {
-            return delayedDeleteAlarms.contains(alarms.get(position).getId());
+        @Override
+        public int getItemPosition(final long id) {
+            return Alarm.getAlarmPosition(alarms, id);
         }
 
 
-        public void delayedDeleteAlarm(final int position) {
-            final Alarm alarm = alarms.get(position);
-            final int alarmId = alarm.getId();
-            if (!delayedDeleteAlarms.contains(alarmId)) {
-                delayedDeleteAlarms.add(alarmId);
-                notifyItemChanged(position);
-                AlarmDbHelper.delayedDeleteAlarm(alarmId);
-            }
+        public Alarm getItem(long id) {
+            return Alarm.getAlarm(alarms, id);
         }
 
 
-        public void undodDeleteAlarm(final int alarmId) {
-            delayedDeleteAlarms.remove(alarmId);
-            final int position = Alarm.getAlarmPosition(alarms, alarmId);
-            if (position > -1) notifyItemChanged(position);
-            // The undo may fail, but subsequent data refresh will correct that and definitely
-            // delete or not this alarm
-            AlarmDbHelper.undoDeleteAlarm(alarmId);
+        @Override
+        public void swapCursor(final Cursor items) {
+            alarms = Alarm.getAlarmsMapList(items);
+            if (!FnUtil.isVoid(alarms))
+                setSubtitle(Alarm.getNextScheduledAlarmText(AlarmListActivity.this, prefs, alarms, Calendar.getInstance()));
+            else setSubtitle(null);
         }
 
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
-
-            public final View view;
-
-            public final TextView timeView;
-            public final TextView titleView;
-            public final TextView nextRingView;
-            public final TextView dateConfigView;
-            public final Switch onoffView;
-
-            public final FrameLayout undoFrame;
-            public final Button undoButton;
-
-            public Alarm alarm = null;
+        @Override
+        public boolean isSwipedState(final long id) {
+            return AlarmDbHelper.hasDeleteAlarm(id);
+        }
 
 
-            public ViewHolder(View view) {
-                super(view);
-                this.view = view;
-                timeView = (TextView) view.findViewById(R.id.time);
-                titleView = (TextView) view.findViewById(R.id.title);
-                nextRingView = (TextView) view.findViewById(R.id.next_ring);
-                dateConfigView = (TextView) view.findViewById(R.id.date_config);
-                onoffView = (Switch) view.findViewById(R.id.onoff);
-                undoFrame = (FrameLayout) view.findViewById(R.id.undo_frame);
-                undoButton = (Button) view.findViewById(R.id.undo_button);
-            }
+        @Override
+        public AlarmHolder onCreateViewHolder(final ViewGroup parent, final int viewType) {
+            final View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.activity_alarm_list_item, parent, false);
+            return new AlarmHolder(prefs, this, view);
+        }
 
 
-            public ViewHolder setAlarm(final Alarm alarm, final boolean undoState) {
-                this.alarm = alarm;
-                if (undoState) {
-                    //Undo mode
-                    undoFrame.setVisibility(View.VISIBLE);
-                    undoButton.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onBindViewHolder(final AlarmHolder holder, final int position) {
+            holder.setAlarm(alarms.getAtPosition(position), position);
+        }
 
-                        @Override
-                        public void onClick(View v) {
-                            undodDeleteAlarm(alarm.getId());
-                        }
 
-                    });
-                } else {
-                    //Normal mode, show data
-                    final Context context = AlarmListActivity.this;
-                    undoFrame.setVisibility(View.GONE);
+        @Override
+        public void onFold(RecyclerView.ViewHolder holder, int type, float fraction) {
+            ((AlarmViewHolder) holder).onFold(type, fraction);
+        }
 
-                    timeView.setText(alarm.getTimeText(context));
-                    timeView.setOnClickListener(new View.OnClickListener() {
 
-                        @Override
-                        public void onClick(View v) {
-                            final TimePickerDialog timePicker = new TimePickerDialog(context,
-                                    new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            return (isSwipedState(viewHolder.getItemId()))? 0 : (ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+        }
 
-                                        @Override
-                                        public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                                            alarm.setTime(selectedHour, selectedMinute);
-                                            AlarmDbHelper.saveAlarm(context, alarm);
-                                        }
 
-                                    }, alarm.getHour(), alarm.getMinutes(), FnUtil.is24HourMode(context));
-                            timePicker.show();
-                        }
-
-                    });
-
-                    titleView.setText(alarm.getTitle(context));
-
-                    int schedule = alarm.kindScheduledRing(Calendar.getInstance());
-                    String next = alarm.getNextRingText(context, false);
-                    if (schedule == Alarm.SCH_YES_VACATION)
-                        nextRingView.setText(context.getString(R.string.next_ring_vacation_message, next));
-                    else nextRingView.setText(context.getString(R.string.next_ring_message, next));
-
-                    view.setOnClickListener(new View.OnClickListener() {
-
-                        @Override
-                        public void onClick(View v) {
-                            if (twoPane) {
-                                final AlarmDetailFragment fragment = new AlarmDetailFragment();
-                                fragment.setArguments(alarm.putAlarm(new Bundle()));
-                                getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.alarm_detail_container, fragment)
-                                        .commit();
-                            } else {
-                                final Context context = AlarmListActivity.this;
-                                context.startActivity(alarm.putAlarm(new Intent(context, AlarmDetailActivity.class)));
-                                overridePendingTransition(R.anim.detail_in, R.anim.list_out);
-                            }
-                        }
-
-                    });
-
-                    dateConfigView.setText(alarm.getAlarmSummaryDateConfig(context));
-
-                    onoffView.setTag(alarm.isEnabled());
-                    onoffView.setChecked(alarm.isEnabled());
-                    onoffView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-                        @Override
-                        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                            //Prevent check from firing the first time
-                            if (buttonView.getTag() != null) {
-                                if (FnUtil.safeBoolEqual(buttonView.getTag(),isChecked)) {
-                                    buttonView.setTag(null);
-                                    return;
-                                }
-                                buttonView.setTag(null);
-                            }
-                            AlarmDbHelper.enableAlarm(context, alarm, isChecked);
-                        }
-
-                    });
-
-                    switch(schedule) {
-                        case Alarm.SCH_NO:
-                            view.setBackgroundColor(ContextCompat.getColor(context, R.color.list_sch_no));
-                            break;
-                        case Alarm.SCH_YES_VACATION:
-                            view.setBackgroundColor(ContextCompat.getColor(context, R.color.list_sch_yes_vacation));
-                            break;
-                        default:
-                            view.setBackgroundColor(ContextCompat.getColor(context, R.color.list_sch_yes));
-                            break;
-                    }
+        @Override
+        public void onSwiped(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int swipeDir) {
+            final int position = viewHolder.getAdapterPosition();
+            final Alarm alarm = alarms.getAtPosition(position);
+            if (alarm != null) {
+                final long alarmId = alarm.getId();
+                if (AlarmDbHelper.addDeleteAlarm(AlarmListActivity.this, prefs, alarmId)) notifyItemChanged(position);
+                if (showSwipeDelete) {
+                    //User has swiped once, disable swipe message forever
+                    showSwipeDelete = false;
+                    prefs.setShowSwipeDelete(showSwipeDelete);
                 }
-                return this;
+            }
+        }
+
+
+        @Override
+        public boolean onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            //Use default paint method
+            return false;
+        }
+
+
+        void undoAction(final long alarmId, final int position) {
+            if (AlarmDbHelper.undoDeleteAlarm(alarmId)) notifyItemChanged(position);
+            //else notifyItemRemoved(position);
+        }
+
+
+        //AlarmHolder
+        class AlarmHolder extends AlarmViewHolder {
+
+            AlarmHolder(final YaaaPreferences prefs, final AlarmAdapter alarmAdapter, final View view) {
+                super(prefs, alarmAdapter, view);
+            }
+
+
+            @SuppressWarnings("unchecked")
+            protected <ActivityType extends Activity & SettingsMaster.SettingsMasterListener> ActivityType getActivity() {
+                return (ActivityType) AlarmListActivity.this;
             }
 
 
             @Override
-            public String toString() {
-                return super.toString() + timeView.getText() + " " + nextRingView.getText();
+            public boolean doOnClick(View v) {
+                if (!super.doOnClick(v)) {
+                    final AlarmHolder aholder = (AlarmHolder) recyclerView.findContainingViewHolder(v);
+                    switch (v.getId()) {
+                        case R.id.undo_action:
+                            undoAction(aholder.getItemId(), aholder.getAdapterPosition());
+                            break;
+                        default:
+                            editAction(aholder);
+                    }
+                }
+                return true;
             }
 
-        } //ViewHolder
-
+        } //AlarmHolder
 
     } //AlarmRecyclerViewAdapter
 
@@ -454,7 +532,7 @@ public class AlarmListActivity extends AppCompatActivity implements
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         emptyList.setVisibility((FnUtil.hasData(data))? View.GONE : View.VISIBLE);
-        recyclerViewAdapter.swapCursor(data);   //Don't reset, just swap (refresh data)
+        alarmAdapter.setData(data);   //Don't reset, just refresh data
     }
 
 
@@ -464,101 +542,49 @@ public class AlarmListActivity extends AppCompatActivity implements
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // SWIPE TO DELETE WITH UNDO
+    @SuppressLint("NewApi")
+    void prepareTransitions() {
+//        getWindow().setExitTransition(
+//                TransitionInflater.from(this).inflateTransition(R.transition.alarm_list_exit));
+//        getWindow().setReturnTransition(
+//                TransitionInflater.from(this).inflateTransition(R.transition.alarm_list_return));
+//        getWindow().setSharedElementEnterTransition(
+//                TransitionInflater.from(this).inflateTransition(R.transition.alarm_detail_shared_enter));
+        setEnterSharedElementCallback(
+                new AlarmListEnhancedSharedElementCallback(this, EnhancedSharedElementCallback.ENTER_MODE));
+        setExitSharedElementCallback(
+                new AlarmListEnhancedSharedElementCallback(this, EnhancedSharedElementCallback.EXIT_MODE));
 
-    private void setUpRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewAdapter = new AlarmRecyclerViewAdapter();
-        recyclerView.setAdapter(recyclerViewAdapter);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
-        setUpItemTouchHelper();
+//        postponeEnterTransition();
+//        main_coordinator.getViewTreeObserver().addOnPreDrawListener(
+//                new ViewTreeObserver.OnPreDrawListener() {
+//                    @Override
+//                    public boolean onPreDraw() {
+//                        main_coordinator.getViewTreeObserver().removeOnPreDrawListener(this);
+//                        startPostponedEnterTransition();
+//                        return true;
+//                    }
+//                }
+//        );
     }
 
 
-    private void setUpItemTouchHelper() {
-        final ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new
-                ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-
-            final Drawable background =
-                    new ColorDrawable(ContextCompat.getColor(AlarmListActivity.this, R.color.delete_swipe_background));
-            final Drawable deleteIcon =
-                    ContextCompat.getDrawable(AlarmListActivity.this, R.drawable.ic_delete);
-            final int deleteIconMargin =
-                    (int) AlarmListActivity.this.getResources().getDimension(R.dimen.swipe_delete_icon_margin);
+    //AlarmListEnhancedSharedElementCallback
+    class AlarmListEnhancedSharedElementCallback extends EnhancedSharedElementCallback {
 
 
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                return false;
-            }
+        public AlarmListEnhancedSharedElementCallback(Context context, int mode) {
+            super(context, mode);
+        }
 
 
-            @Override
-            public int getSwipeDirs(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                final AlarmRecyclerViewAdapter adapter = (AlarmRecyclerViewAdapter) recyclerView.getAdapter();
-                if (adapter.isDelayedDeleteAlarm(viewHolder.getAdapterPosition())) return 0;
-                return super.getSwipeDirs(recyclerView, viewHolder);
-            }
+        @Override
+        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+            super.onMapSharedElements(names, sharedElements);
+        }
 
 
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                final AlarmRecyclerViewAdapter adapter = (AlarmRecyclerViewAdapter) recyclerView.getAdapter();
-                adapter.delayedDeleteAlarm(viewHolder.getAdapterPosition());
-                if (showSwipeDelete) {
-                    //User has swiped once, disable swipe message forever
-                    showSwipeDelete = false;
-                    YaaaApplication.getPreferences().setShowSwipeDelete(showSwipeDelete);
-                }
-            }
+    } //EnterEnhancedSharedElementCallback
 
-
-            @Override
-            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
-
-                if (viewHolder.getAdapterPosition() != -1) {
-                    final View itemView = viewHolder.itemView;
-                    final int iVTop = itemView.getTop();
-                    final int iVBottom = itemView.getBottom();
-                    final int iVLeft = itemView.getLeft();
-                    final int iVRight = itemView.getRight();
-                    int left;
-                    int right;
-                    if (dX > 0) {
-                        //swipe left to right
-                        left =  iVLeft;
-                        right = iVLeft + (int) dX;
-                    } else {
-                        //swipe right to left
-                        left =  iVRight + (int) dX;
-                        right = iVRight;
-                    }
-                    background.setBounds(left, iVTop, right, iVBottom);
-                    background.draw(c);
-
-                    final int intrinsicHeight = deleteIcon.getIntrinsicHeight();
-                    final int delTop = iVTop + ((iVBottom - iVTop) - intrinsicHeight) / 2;
-                    if (dX > 0) {
-                        //swipe left to right
-                        left = right - deleteIconMargin - deleteIcon.getIntrinsicWidth();
-                        right = right - deleteIconMargin;
-                    } else {
-                        //swipe right to left
-                        left = iVRight - deleteIconMargin - deleteIcon.getIntrinsicWidth();
-                        right = iVRight - deleteIconMargin;
-                    }
-                    deleteIcon.setBounds(left, delTop, right, delTop + intrinsicHeight);
-                    deleteIcon.draw(c);
-                }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-            }
-
-        }; //ItemTouchHelper.SimpleCallback
-        final ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
-        mItemTouchHelper.attachToRecyclerView(recyclerView);
-    } //setUpItemTouchHelper
 
 }

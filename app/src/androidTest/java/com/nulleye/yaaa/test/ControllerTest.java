@@ -5,9 +5,11 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 import android.test.ProviderTestCase2;
 
+import com.nulleye.yaaa.YaaaApplication;
 import com.nulleye.yaaa.data.Alarm;
 import com.nulleye.yaaa.data.AlarmDbHelper;
 import com.nulleye.yaaa.data.YaaaContract;
+import com.nulleye.yaaa.data.YaaaPreferences;
 import com.nulleye.yaaa.data.YaaaProvider;
 
 import org.junit.After;
@@ -18,6 +20,8 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class ControllerTest extends ProviderTestCase2<YaaaProvider> {
+
+    YaaaPreferences prefs = YaaaApplication.getPreferences();
 
 
     public ControllerTest() {
@@ -39,7 +43,7 @@ public class ControllerTest extends ProviderTestCase2<YaaaProvider> {
 
         Alarm alarm = new Alarm();
 
-        boolean result = AlarmDbHelper.addAlarm(context, alarm);
+        boolean result = AlarmDbHelper.saveAlarm(context, prefs, alarm);
         assertEquals("Unable to add default alarm", true, result);
 
         Alarm newAlarm = AlarmDbHelper.getAlarm(context, alarm.getId());

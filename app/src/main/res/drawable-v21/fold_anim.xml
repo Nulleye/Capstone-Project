@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_fold">
+     <target
+        android:name="fold_path"
+        android:animation="@animator/fold_morph_anim"/>
+</animated-vector>

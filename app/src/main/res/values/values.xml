@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <integer name="pop_animation_duration">200</integer>
+    <dimen name="pop_item_elevation">8dp</dimen>
+
+    <integer name="expand_animation_duration">300</integer>
+    <integer name="change_animation_duration">200</integer>
+
+    <integer name="animation_reveal_duration">300</integer>
+
+    <item name="drag_dismiss_scale" format="float" type="dimen">0.95</item>
+
+
+    <!-- TRANSITIONS -->
+
+    <integer name="fade_list_item">1350</integer>
+
+
+</resources>

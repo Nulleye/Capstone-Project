@@ -1,3 +1,10 @@
 <resources>
+
     <bool name="isTablet">false</bool>
+
+    <bool name="special_animations">false</bool>
+
+    <integer name="volume_max_steps">20</integer>
+    <integer name="volume_step">5</integer>
+
 </resources>

@@ -1,75 +1,112 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion parent.ext.targetSdkVersion
+    buildToolsVersion parent.ext.buildToolsVersion
 
     defaultConfig {
+        minSdkVersion parent.ext.minSdkVersion
+        targetSdkVersion parent.ext.targetSdkVersion
+
         applicationId "com.nulleye.yaaa"
-        minSdkVersion 16
-        targetSdkVersion 23
-        versionCode 1
-        versionName "kangaroo"
+        versionCode 4
+        versionName "wallaby"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+//        vectorDrawables.generatedDensities = ['ldpi', 'mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi']
+
     }
 
-//    signingConfigs {
-//        release {
-//            storeFile file('release.keystore')
-//            keyAlias 'yaaa.release'
-//            storePassword 'udacity-release'
-//            keyPassword 'udacity-release'
-//        }
-//        debug {
-//            storeFile file("debug.keystore")
-//            keyAlias 'yaaa.debug'
-//            storePassword 'udacity-debug'
-//            keyPassword 'udacity-debug'
-//        }
-//    }
+    signingConfigs {
+        release {
+            storeFile file('release.keystore')
+            keyAlias 'yaaa.release'
+            storePassword 'udacity-release'
+            keyPassword 'udacity-release'
+        }
+        debug {
+            storeFile file("debug.keystore")
+            keyAlias 'yaaa.debug'
+            storePassword 'udacity-debug'
+            keyPassword 'udacity-debug'
+        }
+    }
 
     buildTypes {
         release {
-            //minifyEnabled true
             //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled false
+            shrinkResources false
             debuggable false
-//            signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
         }
         debug {
             debuggable true
-//            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.debug
+            renderscriptDebuggable true
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     androidTestCompile 'junit:junit:4.12'
-
-    androidTestCompile 'com.android.support:support-annotations:23.4.0'
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.android.support:support-v4:23.4.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
+    androidTestCompile "com.android.support:support-annotations:${supportLibVersion}"
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:support-v4:${supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    compile "com.android.support:palette-v7:${supportLibVersion}"
 
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
 
+    //Butterknife findView helper
+    compile 'com.jakewharton:butterknife:8.0.1'
+    apt 'com.jakewharton:butterknife-compiler:8.0.1'
+    //Circular reveal helper for pre-lollipop devices
+    compile('com.github.ozodrukh:CircularReveal:2.0.1@aar') { transitive = true; }
     //Third party libs - Material controls
-    compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') { transitive = true }
-    compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') { transitive = true }
+    compile 'com.afollestad.material-dialogs:core:0.9.0.2'
+    compile 'com.afollestad.material-dialogs:commons:0.9.0.2'
     compile 'biz.kasual:materialnumberpicker:1.2.1'
-
-    //This lib code is included as I have done some small patches and bug corrections
-    //'org.adw.library:discrete-seekbar:1.0.1'
-    compile project (':library')
+    //This lib code is included and changed as I have done some small patches and bug corrections
+    compile project(':discrete-seekbar-library')
+    //This lib code is included and changed as I have done several improvements
+    compile project(':datetime-picker-library')
 
 }
+
+
+///////////
+// TRASH //
+
+//compile 'com.wnafee:vector-compat:1.0.5'
+
+//    androidTestCompile 'com.android.support:support-annotations:23.4.0'
+//    compile 'com.android.support:appcompat-v7:23.4.0'
+//    compile 'com.android.support:design:23.4.0'
+//    compile 'com.android.support:support-v4:23.4.0'
+//    compile 'com.android.support:recyclerview-v7:23.4.0'
+
+//Third party libs - Material controls
+//compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') { transitive = true }
+//compile('com.github.afollestad.material-dialogs:commons:0.8.5.8@aar') { transitive = true }
+
+//Use material pickers for old and new android versions
+//compile 'com.code-troopers.betterpickers:library:3.0.1'
+//compile 'com.wdullaer:materialdatetimepicker:2.5.0'
+//'org.adw.library:discrete-seekbar:1.0.1'
 
 //Material controls libs
 //compile 'com.github.rey5137:material:1.2.2'
@@ -79,3 +116,4 @@ dependencies {
 //compile 'com.android.support:cardview-v7:23.3.0'
 //compile 'com.github.TouchBoarder:weekdays-buttons-bar:v1.0.1'
 //androidTestCompile 'com.android.support.test.espresso:espresso-core:2.0'
+

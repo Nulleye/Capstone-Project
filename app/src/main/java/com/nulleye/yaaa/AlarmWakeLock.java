@@ -5,12 +5,15 @@ import android.os.Build;
 import android.os.PowerManager;
 
 /**
+ * AlarmWakeLock
  * Acquire or Release the CPU lock
- *
  * NFO: Based on code from AOSP class com.android.deskclock.AlarmAlertWakeLock
  *
- * Created by Cristian Alvarez on 27/4/16.
+ * @author Cristian Alvarez Planas
+ * @version 1
+ * 27/4/16
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class AlarmWakeLock {
 
     public static String TAG = AlarmWakeLock.class.getName();

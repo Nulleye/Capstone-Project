@@ -18,18 +18,30 @@ import com.nulleye.yaaa.data.YaaaPreferences;
 import java.util.Calendar;
 
 /**
+ * NextAlarmWidget
  * Implementation of App Widget functionality.
+ *
+ * @author Cristian Alvarez Planas
+ * @version 1
+ * 18/5/16
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class NextAlarmWidget extends AppWidgetProvider {
 
 
     public static String TAG = NextAlarmWidget.class.getName();
+    protected static boolean DEBUG = false;
+
+    YaaaPreferences prefs = YaaaApplication.getPreferences();
 
 
+    /**
+     * Update a widget with the provided alarm
+     */
     static void updateAppWidget(final Context context, final AppWidgetManager appWidgetManager,
             final int appWidgetId, final Alarm alarm) {
-        Log.d(TAG,"updateAppWidget(): " + appWidgetId);
-        final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.next_alarm);
+        if (DEBUG) Log.d(TAG,"updateAppWidget(): " + appWidgetId);
+        final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_next_alarm);
         if (alarm != null) {
             views.setViewVisibility(R.id.appwidget_no_alarm_image, View.INVISIBLE);
             views.setTextViewText(R.id.appwidget_time, alarm.getTimeText(context));
@@ -50,11 +62,10 @@ public class NextAlarmWidget extends AppWidgetProvider {
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.d(TAG,"onUpdate()");
-        final YaaaPreferences prefs = YaaaApplication.getPreferences();
+        if (DEBUG) Log.d(TAG,"onUpdate()");
         final Calendar current = Calendar.getInstance();
         final Alarm nextAlarm = AlarmDbHelper.getNextAlarm(context,
-                prefs.isVacationPeriod() && prefs.isVacationPeriodDate(current), current.getTimeInMillis());
+                prefs.isVacationPeriodState() && prefs.isVacationPeriodDate(current), current.getTimeInMillis());
         for (int appWidgetId : appWidgetIds)
             updateAppWidget(context, appWidgetManager, appWidgetId, nextAlarm);
     }
@@ -72,6 +83,10 @@ public class NextAlarmWidget extends AppWidgetProvider {
     }
 
 
+    /**
+     * Force update all widgets when something has changed
+     * @param context Current context
+     */
     public static void forceUpdateAppWidget(final Context context) {
         final AppWidgetManager awm = AppWidgetManager.getInstance(context);
         if (awm != null) {
@@ -83,6 +98,5 @@ public class NextAlarmWidget extends AppWidgetProvider {
             context.sendBroadcast(intent);
         }
     }
-
 
 }
