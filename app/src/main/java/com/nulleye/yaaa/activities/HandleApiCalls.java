@@ -1,24 +1,15 @@
 package com.nulleye.yaaa.activities;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.AlarmClock;
-import android.speech.tts.Voice;
-import android.text.format.DateFormat;
 
-import com.nulleye.yaaa.AlarmController;
 import com.nulleye.yaaa.AlarmRunner;
-import com.nulleye.yaaa.R;
 import com.nulleye.yaaa.data.Alarm;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 public class HandleApiCalls extends Activity {
 
@@ -89,36 +80,37 @@ public class HandleApiCalls extends Activity {
         }
 
 
-        final StringBuilder selection = new StringBuilder();
-        final List<String> args = new ArrayList<>();
-        setSelectionFromIntent(intent, hour, minutes, selection, args);
-
-        final String message = getMessageFromIntent(intent);
-        final DaysOfWeek daysOfWeek = getDaysFromIntent(intent);
-        final boolean vibrate = intent.getBooleanExtra(AlarmClock.EXTRA_VIBRATE, false);
-        final String alert = intent.getStringExtra(AlarmClock.EXTRA_RINGTONE);
-
-        Alarm alarm = new Alarm(hour, minutes);
-        alarm.enabled = true;
-        alarm.label = message;
-        alarm.daysOfWeek = daysOfWeek;
-        alarm.vibrate = vibrate;
-
-        if (alert == null) {
-            alarm.alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        } else if (AlarmClock.VALUE_RINGTONE_SILENT.equals(alert) || alert.isEmpty()) {
-            alarm.alert = Alarm.NO_RINGTONE_URI;
-        } else {
-            alarm.alert = Uri.parse(alert);
-        }
-        alarm.deleteAfterUse = !daysOfWeek.isRepeating() && skipUi;
-
-        final ContentResolver cr = getContentResolver();
-        alarm = Alarm.addAlarm(cr, alarm);
-        final AlarmInstance alarmInstance = alarm.createInstanceAfter(Calendar.getInstance());
-        setupInstance(alarmInstance, skipUi);
-        final String time = DateFormat.getTimeFormat(mAppContext).format(
-                alarmInstance.getAlarmTime().getTime());
+//TODO HERE!!!!
+//        final StringBuilder selection = new StringBuilder();
+//        final List<String> args = new ArrayList<>();
+//        setSelectionFromIntent(intent, hour, minutes, selection, args);
+//
+//        final String message = getMessageFromIntent(intent);
+//        final DaysOfWeek daysOfWeek = getDaysFromIntent(intent);
+//        final boolean vibrate = intent.getBooleanExtra(AlarmClock.EXTRA_VIBRATE, false);
+//        final String alert = intent.getStringExtra(AlarmClock.EXTRA_RINGTONE);
+//
+//        Alarm alarm = new Alarm(hour, minutes);
+//        alarm.enabled = true;
+//        alarm.label = message;
+//        alarm.daysOfWeek = daysOfWeek;
+//        alarm.vibrate = vibrate;
+//
+//        if (alert == null) {
+//            alarm.alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+//        } else if (AlarmClock.VALUE_RINGTONE_SILENT.equals(alert) || alert.isEmpty()) {
+//            alarm.alert = Alarm.NO_RINGTONE_URI;
+//        } else {
+//            alarm.alert = Uri.parse(alert);
+//        }
+//        alarm.deleteAfterUse = !daysOfWeek.isRepeating() && skipUi;
+//
+//        final ContentResolver cr = getContentResolver();
+//        alarm = Alarm.addAlarm(cr, alarm);
+//        final AlarmInstance alarmInstance = alarm.createInstanceAfter(Calendar.getInstance());
+//        setupInstance(alarmInstance, skipUi);
+//        final String time = DateFormat.getTimeFormat(mAppContext).format(
+//                alarmInstance.getAlarmTime().getTime());
 
 
 
