@@ -3,17 +3,17 @@
 **Udacity Android nDegree - Capstone Project (final project)**  
 This project is part of the Udacity Android online Nano-Degree co-created by Google.
 
-#YAAA (Yet Another Alarm App)
+# YAAA (Yet Another Alarm App)
 
 **Download it on [Google Play](https://play.google.com/store/apps/details?id=com.nulleye.yaaa)**
 
 [![YAAA](preview/Old/yaaa-preview.gif)](https://play.google.com/store/apps/details?id=com.nulleye.yaaa)
 
-##Capstone, Stage 1 - Design
+## Capstone, Stage 1 - Design
 Design the app, build the app project plan.
 
 
-##Capstone, Stage 2 - Build
+## Capstone, Stage 2 - Build
 Build the app, execute the project plan lo.
 
 **Project changes**
